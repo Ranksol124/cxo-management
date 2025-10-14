@@ -23,12 +23,12 @@ class MemberVerificationController extends Controller
 
         // Already verified
         if ($user->email_verified_at) {
-            // Agar user login nahi hai, to login kara do
+        
             if (!Auth::check()) {
                 Auth::login($user);
             }
 
-            return redirect('/portal/change-password')
+            return redirect('/portal/my-profile')
                 ->with('success', 'Your email is already verified. You can change your password here.');
         }
 
@@ -39,7 +39,7 @@ class MemberVerificationController extends Controller
         // Auto login
         Auth::login($user);
 
-        return redirect('/portal/change-password')
+        return redirect('/portal/my-profile')
             ->with('success', 'Email verified successfully! Please set your password.');
     }
 }

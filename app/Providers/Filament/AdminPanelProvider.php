@@ -25,6 +25,12 @@ use App\Filament\Pages\ChangePassword;
 use App\Filament\Pages\ProfileSettings;
 use Rupadana\ApiService\ApiServicePlugin;
 use App\Http\Middleware\ApiPublicRestriction;
+use Jeffgreco13\FilamentBreezy\BreezyCore;
+use Illuminate\Validation\Rules\Password;
+use Filament\Forms\Components\FileUpload;
+
+
+
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -46,11 +52,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            // ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
-                ProfileSettings::class,
-                ChangePassword::class
+                // ProfileSettings::class,
+                // ChangePassword::class
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -58,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
                 StatsOverview::class,
             ])
 
-// ->navigationItems([
+            // ->navigationItems([
 //                     \Filament\Navigation\NavigationItem::make('Plans')
 //                         ->url(fn() => route('filament.admin.resources.plans.index'))
 //                         // ->icon('heroicon-o-clipboard-list')
@@ -89,8 +95,29 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentSpatieRolesPermissionsPlugin::make(),
                 ApiServicePlugin::make()->middleware([
-                      ApiPublicRestriction::class
-                ])
+                    ApiPublicRestriction::class
+                ]),
+                BreezyCore::make()->myProfile(
+                    shouldRegisterUserMenu: true,
+                    shouldRegisterNavigation: true,
+                    navigationGroup: 'Settings',
+                    userMenuLabel: 'My Profile',
+                    hasAvatars: true,
+                    slug: 'my-profile'
+                )
+                    ->passwordUpdateRules(
+                        rules: [Password::default()->mixedCase()->uncompromised(3)],
+                        requiresCurrentPassword: false
+                    )
+
+                    ->enableBrowserSessions(condition: true)
+                    ->avatarUploadComponent(
+                        fn() =>
+                        FileUpload::make('profile_picture')->disk('public')->directory('avatar')
+                    )
+
+
+
             ])
             ->authMiddleware([
                 Authenticate::class,

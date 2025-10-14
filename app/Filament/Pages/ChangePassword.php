@@ -51,7 +51,7 @@ class ChangePassword extends Page
 
         $user->password = Hash::make($this->data['new_password']);
         $user->save();
-        
+          Auth::login($user);   
         Notification::make()->title('Password updated successfully!')->success()->send();
 
         $this->data = [];

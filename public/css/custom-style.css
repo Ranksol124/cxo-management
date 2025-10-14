@@ -14,7 +14,9 @@
     color: rgb(243 244 246);
     /* gray-100 */
 }
-
+.fi-fo-component-ctn{
+ display: flex;
+}
 .fi-sidebar-nav {
     background-color: #fff;
 }

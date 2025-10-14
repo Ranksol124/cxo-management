@@ -103,12 +103,5 @@ class JobPostPolicy
     {
         return $user->checkPermissionTo('force-delete-any JobPost');
     }
-      public function before(User $user, $ability)
-    {
-        if ($user->plan_id === 3) {
-            return true;
-        }
-
-        return false;
-    }
+    
 }

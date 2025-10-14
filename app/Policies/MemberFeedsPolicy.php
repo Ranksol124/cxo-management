@@ -57,8 +57,6 @@ class MemberFeedsPolicy
      */
     public function before(User $user, $ability)
     {
-        if (is_null($user->plan_id)) {
-            return false;
-        }
+      return true;
     }
 }
