@@ -1,0 +1,13 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+@layer components{
+    .date-color{
+        @apply text-[#0891b2];
+    }
+    .fi-ta-col-wrp > div:first-child,.fi-ta-actions {
+        @apply !justify-center;
+    }
+    
+}

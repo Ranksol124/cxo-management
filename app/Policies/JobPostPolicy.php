@@ -1,0 +1,114 @@
+<?php
+
+namespace App\Policies;
+
+use Illuminate\Auth\Access\Response;
+use App\Models\JobPost;
+use App\Models\User;
+
+class JobPostPolicy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        return $this->view($user, new JobPost);
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, JobPost $jobpost): bool
+    {
+        return $user->checkPermissionTo('view JobPost');
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
+    {
+        return $user->checkPermissionTo('create JobPost');
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, JobPost $jobpost): bool
+    {
+        return $user->checkPermissionTo('update JobPost');
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, JobPost $jobpost): bool
+    {
+        return $user->checkPermissionTo('delete JobPost');
+    }
+
+    /**
+     * Determine whether the user can delete any models.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->checkPermissionTo('delete-any JobPost');
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, JobPost $jobpost): bool
+    {
+        return $user->checkPermissionTo('restore JobPost');
+    }
+
+    /**
+     * Determine whether the user can restore any models.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->checkPermissionTo('restore-any JobPost');
+    }
+
+    /**
+     * Determine whether the user can replicate the model.
+     */
+    public function replicate(User $user, JobPost $jobpost): bool
+    {
+        return $user->checkPermissionTo('replicate JobPost');
+    }
+
+    /**
+     * Determine whether the user can reorder the models.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->checkPermissionTo('reorder JobPost');
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, JobPost $jobpost): bool
+    {
+        return $user->checkPermissionTo('force-delete JobPost');
+    }
+
+    /**
+     * Determine whether the user can permanently delete any models.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->checkPermissionTo('force-delete-any JobPost');
+    }
+      public function before(User $user, $ability)
+    {
+        if ($user->plan_id === 3) {
+            return true;
+        }
+
+        return false;
+    }
+}
