@@ -1,11 +1,15 @@
+<div>
 @php
+ $record = $getRecord();
     $userReaction = $getRecord()->likesAndDislikes;
     $userLiked = $userReaction && $userReaction->feed_likes;
     $userDisliked = $userReaction && $userReaction->feed_dislikes;
-
-    $record = $getRecord();
+   $totalLikes = $record->feed_likes->where('feed_likes', 1)->count();
+   
 
 @endphp
+
+
 
 <div x-data="{ showComments: false }" class="rounded-md bg-white w-[1124px] shadow-sm space-y-2 p-4"
     data-id="{{ $getRecord()->id }}" data-liked="{{ $userLiked ? '1' : '0' }}"
@@ -26,7 +30,12 @@
             <span class="text-xs text-gray-500">
                 {{ $getRecord()->created_at->format('jS M Y, h:i A') }}
             </span>
-@if(auth()->check() && auth()->id() === $getRecord()->user_id)
+            
+   
+ 
+
+       
+@if(auth()->check() && auth()->id() == $getRecord()->user_id)
     <x-filament::dropdown placement="bottom-end">
         <x-slot name="trigger">
             <button class="text-gray-500 hover:text-gray-700">⋮</button>
@@ -76,9 +85,6 @@
 @endif
     
 
-
-
-
             <!-- Hidden delete form -->
 
 
@@ -90,13 +96,16 @@
     <div class="text-gray-800 text-sm text-left p-2 w-[1124px] whitespace-pre-line">
         {!! $getRecord()->content !!}
     </div>
+
+<div>
 @foreach($record->attachments as $file)
     <img src="{{ asset('storage/' . $file->attachment_path) }}" class="w-40 h-40 object-cover" />
 @endforeach
-
+</div>
     <div class="flex items-center justify-start space-x-6 text-sm text-gray-600 pt-2">
         <span id="likes-count-{{ $getRecord()->id }}">
-            {{ $getRecord()->likesAndDislikes?->feed_likes ?? 0 }} Likes
+          {{ $getRecord()->likesAndDislikes?->feed_likes ?? 0 }} Likes
+
         </span>
 
         <span>
@@ -160,7 +169,7 @@
         <input type="text" readonly class="border p-2 w-full text-sm" value="{{ url('/post/' . $getRecord()->id) }}">
     </div>
 </div>
-
+@once
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll('[data-id]').forEach(el => {
@@ -312,3 +321,5 @@
 
  
 </script>
+@endonce
+</div>
