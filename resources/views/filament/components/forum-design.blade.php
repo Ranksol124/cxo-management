@@ -8,8 +8,9 @@
 @endphp
 
 @if($getRecord()->public == 1 || (auth()->check() && auth()->id() == $getRecord()->user_id)) 
+@if($getRecord()->public == 0)
     <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">Private</span>
-
+@endif
     <div x-data="{ showComments: false }" class="rounded-md bg-white w-[1124px] shadow-sm space-y-2 p-4"
         data-id="{{ $getRecord()->id }}" data-liked="{{ $userLiked ? '1' : '0' }}"
         data-disliked="{{ $userDisliked ? '1' : '0' }}">
