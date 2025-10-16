@@ -84,7 +84,12 @@ class FeedController extends Controller
     public function unpublish($id)
     {
         $feed = MemberFeed::findOrFail($id);
-        $feed->public = 0; // assuming you use 'public' column for publish status
+        if($feed->public == 0){
+
+            $feed->public = 1;
+        }else{
+            $feed->public = 0;
+        }
         $feed->save();
 
         return back()->with('success', 'Post unpublished successfully.');

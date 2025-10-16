@@ -45,13 +45,17 @@
                                 Edit
                             </x-filament::dropdown.list.item>
 
-                            <!-- Unpublish -->
+                          
                             <x-filament::dropdown.list.item 
                                 icon="heroicon-o-x-circle"
                                 onclick="event.preventDefault(); document.getElementById('unpublish-form-{{ $getRecord()->id }}').submit();">
-                                Unpublish
+                                  @if($getRecord()->public == 0)
+                                     publish
+                                   @elseif($getRecord()->public == 1)
+                                        unpublish
+                                    @endif
                             </x-filament::dropdown.list.item>
-
+ 
                             <!-- Delete -->
                             <x-filament::dropdown.list.item 
                                 icon="heroicon-o-trash"
@@ -93,7 +97,7 @@
 
         <div class="flex items-center justify-start space-x-6 text-sm text-gray-600 pt-2">
             <span id="likes-count-{{ $getRecord()->id }}">
-                <!-- {{ $getRecord()->likesAndDislikes?->feed_likes ?? 0 }} Likes -->
+                {{ $getRecord()->likesAndDislikes?->feed_likes ?? 0 }} Likes
             </span>
 
             <span>
