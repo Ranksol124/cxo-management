@@ -39,7 +39,7 @@ class MemberFeed extends Model
 
     public function likesAndDislikes()
     {
-        return $this->hasMany(FeedLikesAndDislikes::class, 'members_feed_id');
+        return $this->hasOne(FeedLikesAndDislikes::class, 'members_feed_id');
     }
 
 

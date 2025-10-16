@@ -116,7 +116,7 @@ class MemberFeedResource extends Resource
 
 
                         Select::make('public')
-                       
+
                             ->options([
                                 1 => 'Public',
                                 0 => 'Private',
@@ -131,11 +131,20 @@ class MemberFeedResource extends Resource
 
 
 
-
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('public', 1);
+        $query = parent::getEloquentQuery();
+
+        $user = auth()->user();
+
+        return $query->when($user, function ($query) use ($user) {
+            return $query->where(function ($query) use ($user) {
+                $query->where('public', 1) 
+                    ->orWhere('user_id', $user->id); 
+            });
+        });
     }
+
 
 
 
