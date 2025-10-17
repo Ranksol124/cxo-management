@@ -11,8 +11,20 @@ use App\Models\News;
 use App\Models\MemberFeed;
 class ApiController extends Controller
 {
-    public function GetRecordAll()
+    public function GetRecordAll(Request $request)
     {
+     
+        $apiKey = $request->header('x-api-key');
+        $Key = env('Apikey');
+     
+        if ($apiKey !== $Key) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+      
         $models = [
             'events' => [Event::class, []],
             'job_post' => [JobPost::class, []],
@@ -24,7 +36,7 @@ class ApiController extends Controller
         $data = [];
 
         foreach ($models as $key => [$modelClass, $relations]) {
-            $data[$key] = $modelClass::with($relations ?? null)->get();
+            $data[$key] = $modelClass::with($relations)->get();
         }
 
         return response()->json([
@@ -32,6 +44,7 @@ class ApiController extends Controller
             'data' => $data,
         ]);
     }
+
 
 
 }

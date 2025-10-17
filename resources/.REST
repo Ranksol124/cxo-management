@@ -1,8 +1,4 @@
-POST https://cxo.appsreviews.online/api/auth/login
+GET http://localhost:8000/api/data-response
 Content-Type: application/json
 
 
-{
-  "email": "ranksoltools@gmail.com",
-  "password": "ranksol!@#$"
-}
