@@ -3,14 +3,12 @@
 // dd('api.php loaded');
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\MemberFeedController;
+use App\Http\Controllers\ApiController;
 
 
 
 
-Route::get('/test-api', function (Request $request) {
-    return response()->json([
-        'success' => true,
-        'message' => 'API route is working!',
-    ]);
-});
+
+
+Route::get('data-response',[ApiController::class, 'GetRecordAll']);
+

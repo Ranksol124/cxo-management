@@ -1,3 +1,8 @@
-GET https://cxo.appsreviews.online/api/admin/users
+POST https://cxo.appsreviews.online/api/auth/login
 Content-Type: application/json
-X-Api-Key: 12345678
+
+
+{
+  "email": "ranksoltools@gmail.com",
+  "password": "ranksol!@#$"
+}

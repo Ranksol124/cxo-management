@@ -12,11 +12,12 @@ use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
 use App\Notifications\CxoUserWelcomeNotification;
 use Illuminate\Support\Str;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasSuperAdmin;
+    use HasFactory, Notifiable, HasRoles, HasSuperAdmin ,HasApiTokens;
 
     /**
      * The attributes that are mass assignable.

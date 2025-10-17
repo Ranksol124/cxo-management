@@ -31,7 +31,11 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\ViewColumn;
-
+use Illuminate\Support\Facades\Mail;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use App\Services\CvMailerService;
+use Filament\Notifications\Notification;
 class JobPostResource extends Resource
 {
     protected static ?string $model = JobPost::class;
@@ -55,7 +59,7 @@ class JobPostResource extends Resource
                                 TextInput::make('salary')->label('Salary')->numeric(),
                                 DatePicker::make('due_date')->label('Due Date'),
                                 TextInput::make('link')->url()->nullable(),
-                                   Select::make('website_preview')
+                                Select::make('website_preview')
                                     ->options([
                                         1 => 'Yes',
                                         0 => 'No',
@@ -162,20 +166,43 @@ class JobPostResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->icon('heroicon-o-eye')
-                    ->label('') // hide text
-                    ->iconButton(), // icon-only style
+                Tables\Actions\ViewAction::make()->icon('heroicon-o-eye')->label('')->iconButton(),
+                Tables\Actions\EditAction::make()->icon('heroicon-o-pencil')->label('')->iconButton(),
+                Tables\Actions\DeleteAction::make()->icon('heroicon-o-trash')->label('')->iconButton(),
 
-                Tables\Actions\EditAction::make()
-                    ->icon('heroicon-o-pencil')
-                    ->label('')
-                    ->iconButton(),
+                Action::make('applyNow')
+                    ->label('Apply Now')
+                    ->icon('heroicon-o-briefcase')
+                    ->button()
+                    ->visible(fn() => Auth::user()->hasRole('member'))
+                    ->modal('applyNowModal')
+                    ->modalHeading('Upload your CV')
+                    ->modalWidth('md')
+                    ->form([
+                        FileUpload::make('cv')
+                            ->label('Upload your CV')
+                            ->required()
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ]),
+                    ])
+                    ->action(function (array $data, JobPost $record) {
+                        $user = auth()->user();
+                        $cv = $data['cv'];
 
-                Tables\Actions\DeleteAction::make()
-                    ->icon('heroicon-o-trash')
-                    ->label('')
-                    ->iconButton(),
+                        $filePath = storage_path('app/public/' . $cv);
+                        $fileName = basename($cv);
+
+
+                        (new CvMailerService())->sendCv($filePath, $fileName, $user->email);
+
+                        Notification::make()
+                            ->title('Saved successfully')
+                            ->broadcast($user);
+                    }),
+
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
