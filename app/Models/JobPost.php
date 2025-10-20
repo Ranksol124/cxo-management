@@ -42,4 +42,12 @@ class JobPost extends Model
         return $this->belongsTo(\App\Models\User::class);
     }
 
+    public function jobcontent()
+    {
+        return $this->hasMany(\App\Models\JobMembers::class);
+    }
+    public function jobmember()
+    {
+        return $this->hasMany(\App\Models\Member::class);
+    }
 }

@@ -168,7 +168,7 @@ class JobPostResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->icon('heroicon-o-eye')->label('')->iconButton(),
+                Tables\Actions\ViewAction::make()->label('')->button()->label('View Job'),
                 Tables\Actions\EditAction::make()->icon('heroicon-o-pencil')->label('')->iconButton(),
                 Tables\Actions\DeleteAction::make()->icon('heroicon-o-trash')->label('')->iconButton(),
 
@@ -176,6 +176,7 @@ class JobPostResource extends Resource
                     ->label('Apply Now')
                     ->icon('heroicon-o-briefcase')
                     ->button()
+                    // ->extraAttributes(['class'=>'bg-[#06B6D4] text-white  hover:bg-[#06B6D4]'])
                     ->visible(fn() => Auth::user()->hasRole('member'))
                     ->modal('applyNowModal')
                     ->modalHeading('Upload your CV')
@@ -184,8 +185,8 @@ class JobPostResource extends Resource
                         FileUpload::make('cv')
                             ->label('Upload your CV')
                             ->required()
-                            ->disk('public')                    
-                            ->directory('member_cv')           
+                            ->disk('public')
+                            ->directory('member_cv')
                             ->acceptedFileTypes([
                                 'application/pdf',
                                 'application/msword',
