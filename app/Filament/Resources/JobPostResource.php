@@ -36,6 +36,8 @@ use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use App\Services\CvMailerService;
 use Filament\Notifications\Notification;
+use Livewire\Component;
+
 class JobPostResource extends Resource
 {
     protected static ?string $model = JobPost::class;
@@ -182,26 +184,49 @@ class JobPostResource extends Resource
                         FileUpload::make('cv')
                             ->label('Upload your CV')
                             ->required()
+                            ->disk('public')                    
+                            ->directory('member_cv')           
                             ->acceptedFileTypes([
                                 'application/pdf',
                                 'application/msword',
                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            ]),
+                            ])
+
                     ])
-                    ->action(function (array $data, JobPost $record) {
-                        $user = auth()->user();
-                        $cv = $data['cv'];
+                    ->action(function (array $data, JobPost $record, $livewire) {
+                        $loggedInUser = auth()->user();
 
-                        $filePath = storage_path('app/public/' . $cv);
-                        $fileName = basename($cv);
+                        $cvPath = $data['cv'];
+                        $fileName = basename($cvPath);
+                        $absolutePath = storage_path('app/public/' . $cvPath);
 
+                        $jobOwnerEmail = $record->user?->email;
+                        // dd($jobOwnerEmail);
+                        if ($jobOwnerEmail) {
+                            (new CvMailerService())->sendCv(
+                                $absolutePath,
+                                $fileName,
+                                $jobOwnerEmail
+                            );
+                        } else {
+                            return null;
+                        }
 
-                        (new CvMailerService())->sendCv($filePath, $fileName, $user->email);
+                        \App\Models\JobMembers::create([
+                            'members_id' => $loggedInUser->id,
+                            'jobs_id' => $record->id,
+                            'cv_upload' => $cvPath,
+                        ]);
 
                         Notification::make()
-                            ->title('Saved successfully')
-                            ->broadcast($user);
-                    }),
+                            ->title('Applied successfully')
+                            ->success()
+                            ->send();
+
+
+                    })
+
+
 
             ])
             ->bulkActions([

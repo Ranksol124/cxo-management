@@ -8,9 +8,7 @@
 <body>
     <p>Hello,</p>
 
-    <p>Please find attached the CV submitted by a user.</p>
-
-    <p>Thank you!</p>
+    <p>This user has applied for this job .</p>
 </body>
 
 </html>

@@ -13,10 +13,10 @@ class ApiController extends Controller
 {
     public function GetRecordAll(Request $request)
     {
-     
+
         $apiKey = $request->header('x-api-key');
         $Key = env('Apikey');
-     
+
         if ($apiKey !== $Key) {
             return response()->json([
                 'success' => false,
@@ -24,7 +24,7 @@ class ApiController extends Controller
             ], 403);
         }
 
-      
+
         $models = [
             'events' => [Event::class, []],
             'job_post' => [JobPost::class, []],
