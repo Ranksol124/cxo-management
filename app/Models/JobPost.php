@@ -36,4 +36,10 @@ class JobPost extends Model
     {
         return $this->makeEncryptableAttribute();
     }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
+
 }

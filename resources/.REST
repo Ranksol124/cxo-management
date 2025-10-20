@@ -1,3 +1,4 @@
-GET https://cxo.appsreviews.online/api/admin/users
+GET http://localhost:8000/api/data-response
 Content-Type: application/json
-X-Api-Key: 12345678
+
+

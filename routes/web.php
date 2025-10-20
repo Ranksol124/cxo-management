@@ -40,3 +40,5 @@ Route::post('portal/payment/{plan}', [PaymentController::class, 'stripePost'])->
 
 Route::get('/portal/payment-checkout/{planId}', PaymentCheckout::class)
     ->name('filament.pages.payment-checkout');
+
+    

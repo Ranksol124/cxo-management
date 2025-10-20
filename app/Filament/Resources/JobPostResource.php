@@ -31,6 +31,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\ViewColumn;
+use Illuminate\Support\Facades\Mail;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use App\Services\CvMailerService;
+use Filament\Notifications\Notification;
+use Livewire\Component;
 
 class JobPostResource extends Resource
 {
@@ -55,7 +61,7 @@ class JobPostResource extends Resource
                                 TextInput::make('salary')->label('Salary')->numeric(),
                                 DatePicker::make('due_date')->label('Due Date'),
                                 TextInput::make('link')->url()->nullable(),
-                                   Select::make('website_preview')
+                                Select::make('website_preview')
                                     ->options([
                                         1 => 'Yes',
                                         0 => 'No',
@@ -162,20 +168,66 @@ class JobPostResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->icon('heroicon-o-eye')
-                    ->label('') // hide text
-                    ->iconButton(), // icon-only style
+                Tables\Actions\ViewAction::make()->icon('heroicon-o-eye')->label('')->iconButton(),
+                Tables\Actions\EditAction::make()->icon('heroicon-o-pencil')->label('')->iconButton(),
+                Tables\Actions\DeleteAction::make()->icon('heroicon-o-trash')->label('')->iconButton(),
 
-                Tables\Actions\EditAction::make()
-                    ->icon('heroicon-o-pencil')
-                    ->label('')
-                    ->iconButton(),
+                Action::make('applyNow')
+                    ->label('Apply Now')
+                    ->icon('heroicon-o-briefcase')
+                    ->button()
+                    ->visible(fn() => Auth::user()->hasRole('member'))
+                    ->modal('applyNowModal')
+                    ->modalHeading('Upload your CV')
+                    ->modalWidth('md')
+                    ->form([
+                        FileUpload::make('cv')
+                            ->label('Upload your CV')
+                            ->required()
+                            ->disk('public')                    
+                            ->directory('member_cv')           
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ])
 
-                Tables\Actions\DeleteAction::make()
-                    ->icon('heroicon-o-trash')
-                    ->label('')
-                    ->iconButton(),
+                    ])
+                    ->action(function (array $data, JobPost $record, $livewire) {
+                        $loggedInUser = auth()->user();
+
+                        $cvPath = $data['cv'];
+                        $fileName = basename($cvPath);
+                        $absolutePath = storage_path('app/public/' . $cvPath);
+
+                        $jobOwnerEmail = $record->user?->email;
+                        // dd($jobOwnerEmail);
+                        if ($jobOwnerEmail) {
+                            (new CvMailerService())->sendCv(
+                                $absolutePath,
+                                $fileName,
+                                $jobOwnerEmail
+                            );
+                        } else {
+                            return null;
+                        }
+
+                        \App\Models\JobMembers::create([
+                            'members_id' => $loggedInUser->id,
+                            'jobs_id' => $record->id,
+                            'cv_upload' => $cvPath,
+                        ]);
+
+                        Notification::make()
+                            ->title('Applied successfully')
+                            ->success()
+                            ->send();
+
+
+                    })
+
+
+
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
