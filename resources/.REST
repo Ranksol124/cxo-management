@@ -1,33 +1,100 @@
-POST http://localhost:8000/api/admin/member-contents
+# POST http://localhost:8000/api/admin/member-contents
+# Content-Type: application/json
+# x-api-key: 12345678
+
+#   { 
+#     "member_id":57,
+#     "title": "This is a test post title",
+#     "description": "<This is a test post description",
+#     "content_type":"company",
+#     "news_type":"trending",
+#     "status": 1  
+#   }
+
+
+
+# PUT http://localhost:8000/api/admin/member-contents/{id}
+# Content-Type: application/json
+# x-api-key: 12345678
+
+#   { 
+#     "member_id":111 ,
+#     "title": "This is a test post title",
+#     "description": "<This is a test post description",
+#     "content_type":"company",
+#     "news_type":"trending",
+#     "status": 1  
+#   }
+
+
+
+# DELETE http://localhost:8000/api/admin/member-contents/{id}
+# Content-Type: application/json
+# x-api-key: 12345678
+
+
+# POST http://localhost:8000/api/auth/login
+# Content-Type: application/json
+
+# {
+#   "email": "mabdullahasif124@gmail.com",
+#   "password":"Asfasf!@#$"
+# }
+
+
+
+
+# POST http://localhost:8000/api/auth/update-info
+# Authorization: Bearer 7|OWVDpIoahgyg9zkYIZT6KqKRhYwu1qps7V487oQI16f9b4bc
+# Accept: application/json
+# Content-Type: application/json
+
+# {
+#   "name": "abdullah",
+#   "email": "mabdullahasif124@gmail.com",
+#   "profile_picture": "avatars/Mp4cYqiA3Jt0uUVFyxXxEmADcuyhMioRRQQL0AOc.png"
+# }
+
+
+
+# POST http://localhost:8000/api/auth/password-update
+# Authorization: Bearer 7|OWVDpIoahgyg9zkYIZT6KqKRhYwu1qps7V487oQI16f9b4bc
+# Accept: application/json
+# Content-Type: application/json
+
+# {
+#   "password": "Asfasf1234",
+#   "password_confirmation": "Asfasf1234"
+# }
+
+
+
+# POST http://localhost:8000/api/auth/login
+# Accept: application/json
+# Content-Type: application/json
+
+# {
+#   "email": "ranksoltools@gmail.com",
+#   "password": "ranksol!@#$"
+# }
+
+POST http://localhost:8000/api/admin/job-posts
+Accept: application/json
 Content-Type: application/json
-x-api-key: 12345678
+x-api-key:12345678
 
   { 
-    "member_id":57,
+    "user_id":57,
     "title": "This is a test post title",
     "description": "<This is a test post description",
-    "content_type":"company",
-    "news_type":"trending",
-    "status": 1  
+    "company":"company",
+    "designation":"designation",
+    "job_type":"full time",
+    "salary":"full time",
+    "due_date":"1990-07-01",
+    "link":"https://link here",
+    "job_image": "File here",
+    "address": "address here",
+    "job_status": 1,
+    "website_preview": 1  
   }
-
-
-
-PUT http://localhost:8000/api/admin/member-contents/{id}
-Content-Type: application/json
-x-api-key: 12345678
-
-  { 
-    "member_id":111 ,
-    "title": "This is a test post title",
-    "description": "<This is a test post description",
-    "content_type":"company",
-    "news_type":"trending",
-    "status": 1  
-  }
-
-
-
-DELETE http://localhost:8000/api/admin/member-contents/{id}
-Content-Type: application/json
-x-api-key: 12345678
