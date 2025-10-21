@@ -69,11 +69,32 @@
 
 
 
-POST http://localhost:8000/api/auth/login
+# POST http://localhost:8000/api/auth/login
+# Accept: application/json
+# Content-Type: application/json
+
+# {
+#   "email": "ranksoltools@gmail.com",
+#   "password": "ranksol!@#$"
+# }
+
+POST http://localhost:8000/api/admin/job-posts
 Accept: application/json
 Content-Type: application/json
+x-api-key:12345678
 
-{
-  "email": "ranksoltools@gmail.com",
-  "password": "ranksol!@#$"
-}
+  { 
+    "user_id":57,
+    "title": "This is a test post title",
+    "description": "<This is a test post description",
+    "company":"company",
+    "designation":"designation",
+    "job_type":"full time",
+    "salary":"full time",
+    "due_date":"1990-07-01",
+    "link":"https://link here",
+    "job_image": "File here",
+    "address": "address here",
+    "job_status": 1,
+    "website_preview": 1  
+  }

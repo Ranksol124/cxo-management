@@ -31,10 +31,18 @@ class CreateHandler extends Handlers
     {
         $model = new (static::getModel());
 
-        $model->fill($request->all());
+        $data = $request->except('job_image'); 
 
+        if ($request->hasFile('job_image')) {
+            $path = $request->file('job_image')->store('job_images', 'public');
+            $data['job_image'] = $path;
+        }
+
+        $model->fill($data);
         $model->save();
 
-        return static::sendSuccessResponse($model, "Successfully Create Resource");
+        return static::sendSuccessResponse($model, "Successfully Created Resource");
     }
+
+
 }
