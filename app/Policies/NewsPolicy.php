@@ -53,7 +53,7 @@ class NewsPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any News');
+        return $this->delete($user, new News);
     }
 
     /**

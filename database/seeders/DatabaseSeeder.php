@@ -6,7 +6,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\FilamentTestUsersSeeder;
-use Database\Seeders\RolePermissionSeeder;
+use Database\Seeders\PermissionSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
-            FilamentTestUsersSeeder::class,
-            RolePermissionSeeder::class,
+            // FilamentTestUsersSeeder::class,
+            PermissionSeeder::class,
         ]);
         // User::factory()->create([
         //     'name' => 'Test User',

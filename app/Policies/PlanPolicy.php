@@ -13,8 +13,7 @@ class PlanPolicy
      */
     public function viewAny(User $user): bool
     {
-        // return $this->view($user, new Plan);
-        return true;
+        return $this->view($user, new Plan);
     }
 
     /**
@@ -22,8 +21,7 @@ class PlanPolicy
      */
     public function view(User $user, Plan $plan): bool
     {
-        // return $user->checkPermissionTo('view Plan');
-           return true;
+        return $user->checkPermissionTo('view Plan');
     }
 
     /**
@@ -55,7 +53,7 @@ class PlanPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any Plan');
+        return $this->delete($user, new Plan);
     }
 
     /**

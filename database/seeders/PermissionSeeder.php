@@ -4,26 +4,15 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
-class RolePermissioneeder extends Seeder
+class PermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run()
+    public function run(): void
     {
-        // Create Role
-        // $admin = Role::create(['name' => 'admin']);
-        // $superadmin = Role::create(['name' => 'super-admin']);
-        // $editor = Role::create(['name' => 'editor']);
-        // $user = Role::create(['name' => 'user']);
-        // $enterpriseUser = Role::create(['name' => 'enterprise-user']);
-        // $goldUser = Role::create(['name' => 'gold-user']);
-        // $silverUser = Role::create(['name' => 'silver-user']);
-
-
         $Permission = [
             'create Magazine',
             'edit Magazine',
@@ -65,6 +54,14 @@ class RolePermissioneeder extends Seeder
             'edit MemberFeed',
             'delete MemberFeed',  
             'view MemberFeed',
+            'create JobPost',
+            'edit JobPost',
+            'delete JobPost',
+            'view JobPost',
+            'create Event',
+            'edit Event',
+            'delete Event',
+            'view Event',
         ];
 
         foreach ($Permission as $permission) {
@@ -77,6 +74,5 @@ class RolePermissioneeder extends Seeder
                 ['model' => $model]
             );
         }
-
     }
 }

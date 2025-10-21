@@ -50,7 +50,7 @@ class EventPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any Event');
+        return $this->delete($user, new Event);
     }
 
     /**

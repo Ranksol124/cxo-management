@@ -53,7 +53,7 @@ class JobPostPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any JobPost');
+        return $this->delete($user, new JobPost);
     }
 
     /**

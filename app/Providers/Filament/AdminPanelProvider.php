@@ -93,7 +93,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->plugins([
-                FilamentSpatieRolesPermissionsPlugin::make(),
+                // FilamentSpatieRolesPermissionsPlugin::make(),
                 ApiServicePlugin::make()->middleware([
                     ApiPublicRestriction::class
                 ]),

@@ -53,7 +53,7 @@ class UserPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any User');
+        return $this->delete($user, new User);
     }
 
     /**

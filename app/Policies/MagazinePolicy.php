@@ -53,7 +53,7 @@ class MagazinePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any Magazine');
+        return $this->delete($user, new Magazine);
     }
 
     /**

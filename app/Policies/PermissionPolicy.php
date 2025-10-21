@@ -53,7 +53,7 @@ class PermissionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any Permission');
+        return $this->delete($user, new Permission);
     }
 
     /**
