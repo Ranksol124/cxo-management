@@ -22,10 +22,12 @@ class UpdateMemberFeedRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'user_id' => 'required',
-			'content' => 'required|string',
-			'public' => 'required',
-			'report_reasons' => 'required'
-		];
+            'user_id' => 'required|exists:users,id',
+            'content' => 'required|string',
+            'public' => 'required|boolean',
+            'attachment_path' => 'nullable|array',
+            'attachment_path.*' => 'file|mimes:jpg,jpeg,png,gif,webp|max:2048',
+        ];
     }
+
 }

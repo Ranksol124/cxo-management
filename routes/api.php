@@ -14,4 +14,6 @@ Route::get('data-response', [ApiController::class, 'GetRecordAll']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/auth/update-info', [ApiController::class, 'updateProfile']);
     Route::post('/auth/password-update', [ApiController::class, 'updatePassword']);
+    Route::post('/auth/password-reset', [ApiController::class, 'passwordReset']);
 });
+

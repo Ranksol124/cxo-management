@@ -92,4 +92,10 @@ class ApiController extends Controller
 
         return response()->json(['message' => 'Password updated successfully']);
     }
+
+
+
+    public function passwordReset(){
+        
+    }
 }

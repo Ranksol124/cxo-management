@@ -31,10 +31,29 @@ class CreateHandler extends Handlers
     {
         $model = new (static::getModel());
 
-        $model->fill($request->all());
-
+        $model->fill($request->except('attachment_path'));
         $model->save();
 
-        return static::sendSuccessResponse($model, "Successfully Create Resource");
+        $files = $request->file('attachment_path');
+
+        if ($files) {
+            $files = is_array($files) ? $files : [$files];
+
+            foreach ($files as $file) {
+                $path = $file->store('members', 'public');
+
+                $model->attachments()->create([
+                    'attachment_path' => $path,
+                ]);
+            }
+        }
+
+        return static::sendSuccessResponse(
+            $model->load('attachments'),
+            "Successfully created MemberFeed with attachments"
+        );
     }
+
+
+
 }

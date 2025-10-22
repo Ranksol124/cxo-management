@@ -95,7 +95,7 @@ class JobContentResource extends Resource
                         );
                     })
                     ->html()
-                    ->alignCenter()->extraAttributes(['style' => 'max-width: 170px;']) // Optional: align text center
+                    ->alignCenter()->extraAttributes(['style' => 'max-width: 170px;']) 
 
             ])
             ->actions([
