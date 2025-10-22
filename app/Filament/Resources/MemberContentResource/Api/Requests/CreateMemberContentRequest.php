@@ -22,12 +22,13 @@ class CreateMemberContentRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'member_id' => 'required',
-			'title' => 'required',
-			'description' => 'required|string',
-			'status' => 'required',
-			'content_type' => 'required',
-			'news_type' => 'required'
-		];
+            'member_id' => 'required',
+            'title' => 'required',
+            'description' => 'required|string',
+            'status' => 'required',
+            'content_type' => 'required',
+            'news_type' => 'required',
+            'file_path' => 'file|mimes:jpg,jpeg,png,gif,webp|max:2048'
+        ];
     }
 }

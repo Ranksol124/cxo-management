@@ -32,6 +32,7 @@ use Filament\Tables\Columns\SelectColumn;
 class EventResource extends Resource
 {
 
+
     protected static ?string $model = Event::class;
     protected static ?string $navigationGroup = 'Media Center';
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';

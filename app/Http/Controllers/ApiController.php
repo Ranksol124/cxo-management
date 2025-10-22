@@ -95,7 +95,13 @@ class ApiController extends Controller
 
 
 
-    public function passwordReset(){
-        
+    public function passwordReset()
+    {
+
+    }
+
+    public function ApplyJob()
+    {
+
     }
 }

@@ -6,16 +6,18 @@ use Rupadana\ApiService\Http\Handlers;
 use App\Filament\Resources\MemberContentResource;
 use App\Filament\Resources\MemberContentResource\Api\Requests\UpdateMemberContentRequest;
 
-class UpdateHandler extends Handlers {
-    public static string | null $uri = '/{id}';
-    public static string | null $resource = MemberContentResource::class;
-  public static bool $public = true;
+class UpdateHandler extends Handlers
+{
+    public static string|null $uri = '/{id}';
+    public static string|null $resource = MemberContentResource::class;
+    public static bool $public = true;
     public static function getMethod()
     {
         return Handlers::PUT;
     }
 
-    public static function getModel() {
+    public static function getModel()
+    {
         return static::$resource::getModel();
     }
 
@@ -32,12 +34,25 @@ class UpdateHandler extends Handlers {
 
         $model = static::getModel()::find($id);
 
-        if (!$model) return static::sendNotFoundResponse();
+        if (!$model) {
+            return static::sendNotFoundResponse();
+        }
 
-        $model->fill($request->all());
-
+        $data = $request->except('file_path');
+        $model->fill($data);
         $model->save();
 
-        return static::sendSuccessResponse($model, "Successfully Update Resource");
+        if ($request->hasFile('file_path')) {
+            $path = $request->file('file_path')->store('job_images', 'public');
+
+            $model->attachments()->delete();
+
+            $model->attachments()->create([
+                'file_path' => $path,
+            ]);
+        }
+
+        return static::sendSuccessResponse($model->fresh('attachments'), "Successfully Updated Resource");
     }
+
 }

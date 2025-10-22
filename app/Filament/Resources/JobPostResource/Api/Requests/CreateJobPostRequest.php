@@ -31,7 +31,7 @@ class CreateJobPostRequest extends FormRequest
 			'salary' => 'required',
 			'due_date' => 'required|date',
 			'link' => 'required',
-			'job_image' => 'required',
+            'job_image' => 'file|mimes:jpg,jpeg,png,gif,webp|max:2048',
 			'address' => 'required',
 			'job_status' => 'required',
 			'website_preview' => 'required'
