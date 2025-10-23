@@ -24,17 +24,17 @@ class CreateJobPostRequest extends FormRequest
         return [
 			'user_id' => 'required',
 			'title' => 'required',
-			'description' => 'required|string',
+			'description' => 'nullable|string',
 			'company' => 'required',
 			'designation' => 'required',
-			'job_type' => 'required',
-			'salary' => 'required',
+			'job_type' => 'nullable',
+			'salary' => 'nullable',
 			'due_date' => 'required|date',
-			'link' => 'required',
+			'link' => 'nullable',
             'job_image' => 'file|mimes:jpg,jpeg,png,gif,webp|max:2048',
-			'address' => 'required',
-			'job_status' => 'required',
-			'website_preview' => 'required'
+			'address' => 'nullable',
+			'job_status' => 'nullable',
+			'website_preview' => 'nullable'
 		];
     }
 }

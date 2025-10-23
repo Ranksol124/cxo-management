@@ -10,7 +10,7 @@ use App\Models\JobPost;
 use App\Models\Magazine;
 use App\Models\News;
 use App\Models\MemberFeed;
-
+use App\Models\Member;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -38,6 +38,7 @@ class ApiController extends Controller
             'news' => [News::class, []],
             'magzines' => [Magazine::class, []],
             'user' => [User::class, []],
+            'members' => [Member::class, []],
             'member_feeds' => [MemberFeed::class, ['comments', 'attachments', 'likesAndDislikes']],
         ];
 
