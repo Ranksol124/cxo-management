@@ -20,7 +20,6 @@ class ApiController extends Controller
 {
     public function GetRecordAll(Request $request)
     {
-
         $apiKey = $request->header('x-api-key');
         $Key = env('Apikey');
 
@@ -31,10 +30,22 @@ class ApiController extends Controller
             ], 403);
         }
 
+        // Assuming you want to get user ID from somewhere
+        // Since no route param, maybe from API key or Auth? 
+        // For now, I'll just assume user_id is in the request header 'user-id'
+        $userId = $request->header('user-id'); // You need to send this in your request headers
+
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User ID header missing',
+            ], 400);
+        }
 
         $models = [
             'events' => [Event::class, []],
-            'job_post' => [JobPost::class, []],
+            'job_post' => [JobPost::class, []],       // no filtering here
+            'my_jobs' => [JobPost::class, []],        // filter by user_id
             'news' => [News::class, []],
             'magzines' => [Magazine::class, []],
             'user' => [User::class, []],
@@ -45,7 +56,11 @@ class ApiController extends Controller
         $data = [];
 
         foreach ($models as $key => [$modelClass, $relations]) {
-            $data[$key] = $modelClass::with($relations)->get();
+            if ($key === 'my_jobs') {
+                $data[$key] = $modelClass::with($relations)->where('user_id', $userId)->get();
+            } else {
+                $data[$key] = $modelClass::with($relations)->get();
+            }
         }
 
         return response()->json([
