@@ -10,11 +10,14 @@ use App\Models\JobPost;
 use App\Models\Magazine;
 use App\Models\News;
 use App\Models\MemberFeed;
+use App\Models\JobMembers;
 use App\Models\Member;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Services\CvMailerService;
 
+use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
 {
@@ -30,10 +33,8 @@ class ApiController extends Controller
             ], 403);
         }
 
-        // Assuming you want to get user ID from somewhere
-        // Since no route param, maybe from API key or Auth? 
-        // For now, I'll just assume user_id is in the request header 'user-id'
-        $userId = $request->header('user-id'); // You need to send this in your request headers
+
+        $userId = $request->header('user-id');
 
         if (!$userId) {
             return response()->json([
@@ -44,8 +45,8 @@ class ApiController extends Controller
 
         $models = [
             'events' => [Event::class, []],
-            'job_post' => [JobPost::class, []],       // no filtering here
-            'my_jobs' => [JobPost::class, []],        // filter by user_id
+            'job_post' => [JobPost::class, []],
+            'my_jobs' => [JobPost::class, []],
             'news' => [News::class, []],
             'magzines' => [Magazine::class, []],
             'user' => [User::class, []],
@@ -116,8 +117,51 @@ class ApiController extends Controller
 
     }
 
-    public function ApplyJob()
-    {
 
+
+    public function ApplyJob(Request $request, CvMailerService $cvMailerService)
+    {
+       
+        $validator = Validator::make($request->all(), [
+            'members_id' => 'required|exists:users,id',
+            'jobs_id' => 'required|exists:job_posts,id',
+            'name' => 'required|string|max:255',
+            'current_address' => 'nullable|string',
+            'education' => 'nullable|string',
+            'experience' => 'nullable|string',
+            'cover_letter' => 'nullable|string',
+            'cv_upload' => 'required|file|mimes:pdf,doc,docx|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $cvFile = $request->file('cv_upload');
+        $cvPath = $cvFile->store('member_cv', 'public');  
+        $cvFileName = $cvFile->getClientOriginalName();
+
+
+        $jobMember = JobMembers::create([
+            'members_id' => $request->members_id,
+            'jobs_id' => $request->jobs_id,
+            'name' => $request->name,
+            'current_address' => $request->current_address,
+            'education' => $request->education,
+            'experience' => $request->experience,
+            'cover_letter' => $request->cover_letter,
+            'cv_upload' => $cvPath,
+        ]);
+
+        $jobPost = JobPost::find($request->jobs_id);
+        if (!$jobPost || !$jobPost->user) {
+            return response()->json(['message' => 'Job post or owner not found.'], 404);
+        }
+        $jobPostOwnerEmail = $jobPost->user->email;
+
+        $cvMailerService->sendCv(storage_path('app/public/' . $cvPath), $cvFileName, $jobPostOwnerEmail);
+
+        return response()->json(['message' => 'Job applied successfully']);
     }
+
 }
