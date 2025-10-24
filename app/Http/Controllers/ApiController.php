@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MemberContent;
 use App\Models\User;
 use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
@@ -34,7 +35,7 @@ class ApiController extends Controller
         }
 
 
-        $userId = $request->header('user-id');
+        $userId = $request->header('member-id');
 
         if (!$userId) {
             return response()->json([
@@ -43,6 +44,8 @@ class ApiController extends Controller
             ], 400);
         }
 
+        $memberId = Member::where('user_id', $userId)->first();
+        // dd($memberId->id);
         $models = [
             'events' => [Event::class, []],
             'job_post' => [JobPost::class, []],
@@ -52,12 +55,16 @@ class ApiController extends Controller
             'user' => [User::class, []],
             'members' => [Member::class, []],
             'member_feeds' => [MemberFeed::class, ['comments', 'attachments', 'likesAndDislikes']],
+            'member_contents' => [MemberContent::class, []],
+            'my_content' => [MemberContent::class, []],
         ];
 
         $data = [];
 
         foreach ($models as $key => [$modelClass, $relations]) {
-            if ($key === 'my_jobs') {
+            if ($key === 'my_content') {
+                $data[$key] = $modelClass::with($relations)->where('member_id', $memberId->id)->get();
+            } elseif ($key === 'my_jobs') {
                 $data[$key] = $modelClass::with($relations)->where('user_id', $userId)->get();
             } else {
                 $data[$key] = $modelClass::with($relations)->get();
@@ -121,7 +128,7 @@ class ApiController extends Controller
 
     public function ApplyJob(Request $request, CvMailerService $cvMailerService)
     {
-       
+
         $validator = Validator::make($request->all(), [
             'members_id' => 'required|exists:users,id',
             'jobs_id' => 'required|exists:job_posts,id',
@@ -138,7 +145,7 @@ class ApiController extends Controller
         }
 
         $cvFile = $request->file('cv_upload');
-        $cvPath = $cvFile->store('member_cv', 'public');  
+        $cvPath = $cvFile->store('member_cv', 'public');
         $cvFileName = $cvFile->getClientOriginalName();
 
 
