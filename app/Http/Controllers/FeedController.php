@@ -117,7 +117,7 @@ class FeedController extends Controller
 
         $comment = FeedComments::create([
             'members_feed_id' => $feed->id,
-            'user_id' => auth()->id(),
+            'user_id' => $request->user_id,
             'feed_comments' => $request->feed_comments,
         ]);
 
