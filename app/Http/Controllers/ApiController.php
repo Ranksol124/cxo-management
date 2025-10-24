@@ -34,7 +34,6 @@ class ApiController extends Controller
             ], 403);
         }
 
-
         $userId = $request->header('member-id');
 
         if (!$userId) {
@@ -44,8 +43,10 @@ class ApiController extends Controller
             ], 400);
         }
 
-        $memberId = Member::where('user_id', $userId)->first();
-        // dd($memberId->id);
+        $member = Member::where('user_id', $userId)->first();
+
+        $memberId = $member ? $member->id : null;
+
         $models = [
             'events' => [Event::class, []],
             'job_post' => [JobPost::class, []],
@@ -63,9 +64,15 @@ class ApiController extends Controller
 
         foreach ($models as $key => [$modelClass, $relations]) {
             if ($key === 'my_content') {
-                $data[$key] = $modelClass::with($relations)->where('member_id', $memberId->id)->get();
+
+                $data[$key] = $memberId
+                    ? $modelClass::with($relations)->where('member_id', $memberId)->get()
+                    : collect();
             } elseif ($key === 'my_jobs') {
-                $data[$key] = $modelClass::with($relations)->where('user_id', $userId)->get();
+
+                $data[$key] = $userId
+                    ? $modelClass::with($relations)->where('user_id', $userId)->get()
+                    : collect();
             } else {
                 $data[$key] = $modelClass::with($relations)->get();
             }
