@@ -24,7 +24,7 @@ class FeedController extends Controller
             $likeRecord->feed_likes = true;
             $likeRecord->feed_dislikes = false;
         }
-
+        
         $likeRecord->save();
 
         $likesCount = FeedLikesAndDislikes::where('members_feed_id', $feed->id)->where('feed_likes', true)->count();

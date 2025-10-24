@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\RoleRedirect::class);
+        $middleware->alias([
+            'ApiPublicRestriction' => \App\Http\Middleware\ApiPublicRestriction::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
