@@ -33,7 +33,7 @@ class MemberFeed extends Model
 
     public function comments()
     {
-        return $this->hasMany(FeedComments::class, 'members_feed_id')->user();
+        return $this->hasMany(FeedComments::class, 'members_feed_id')->with('user');
     }
 
 
