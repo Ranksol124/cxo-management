@@ -55,7 +55,7 @@ class ApiController extends Controller
             'magzines' => [Magazine::class, []],
             'user' => [User::class, []],
             'members' => [Member::class, []],
-            'member_feeds' => [MemberFeed::class, ['comments', 'attachments', 'likesAndDislikes']],
+            'member_feeds' => [MemberFeed::class, ['user', 'comments', 'attachments', 'likesAndDislikes']],
             'member_contents' => [MemberContent::class, []],
             'my_content' => [MemberContent::class, []],
         ];
