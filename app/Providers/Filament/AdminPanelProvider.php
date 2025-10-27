@@ -42,7 +42,6 @@ class AdminPanelProvider extends PanelProvider
             ->path('portal')
             ->login()->passwordReset()
             ->darkMode(false) // user ko toggle hide, tum default fix kar do
-
             ->colors([
                 'primary' => Color::Cyan,
             ])->brandLogo(asset('images/logo.png'))->brandLogoHeight('2rem')

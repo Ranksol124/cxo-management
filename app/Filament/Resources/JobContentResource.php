@@ -37,7 +37,7 @@ class JobContentResource extends Resource
     protected static ?string $navigationGroup = 'Media Center';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    // 👇 ONLY show in sidebar if super-admin
+
     public static function shouldRegisterNavigation(): bool
     {
         return Auth::user()?->hasRole('super-admin');
@@ -95,7 +95,7 @@ class JobContentResource extends Resource
                         );
                     })
                     ->html()
-                    ->alignCenter()->extraAttributes(['style' => 'max-width: 170px;']) 
+                    ->alignCenter()->extraAttributes(['style' => 'max-width: 170px;'])
 
             ])
             ->actions([

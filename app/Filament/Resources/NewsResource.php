@@ -52,26 +52,26 @@ class NewsResource extends Resource
                                         ->label('Title')
                                         ->required(),
                                     \Filament\Forms\Components\RichEditor::make('description')
-                                    ->label('Description')
-                                    ->toolbarButtons([
-                                        'blockquote',
-                                        'bold',
-                                        'bulletList',
-                                        'code',
-                                        'codeBlock',
-                                        'h1',
-                                        'h2',
-                                        'h3',
-                                        'italic',
-                                        'link',
-                                        'orderedList',
-                                        'redo',
-                                        'strike',
-                                        'underline',
-                                        'undo',
+                                        ->label('Description')
+                                        ->toolbarButtons([
+                                            'blockquote',
+                                            'bold',
+                                            'bulletList',
+                                            'code',
+                                            'codeBlock',
+                                            'h1',
+                                            'h2',
+                                            'h3',
+                                            'italic',
+                                            'link',
+                                            'orderedList',
+                                            'redo',
+                                            'strike',
+                                            'underline',
+                                            'undo',
 
-                                    ])
-                                    ->columnSpanFull(),
+                                        ])
+                                        ->columnSpanFull(),
 
                                     Select::make('news_type')
                                         ->label('News Type')
@@ -105,7 +105,7 @@ class NewsResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                // if NOT super-admin, only show active events
+
                 if (!auth()->user()?->hasRole(['super-admin', 'admin'])) {
                     $query->where('status', 1);
                 }
@@ -120,7 +120,7 @@ class NewsResource extends Resource
                     Stack::make([
                         ImageColumn::make('image')
                             ->extraImgAttributes(['class' => 'rounded-t-md !h-40 !w-40'])
-                            ->defaultImageUrl(asset('icons/no_icon.svg')), // 👈 fallback image
+                            ->defaultImageUrl(asset('icons/no_icon.svg')),
                     ])->extraAttributes(['class' => 'mb-4 text-center']),
 
                     Stack::make([
@@ -147,6 +147,7 @@ class NewsResource extends Resource
                         //     ->onColor('success')
                         //     ->offColor('danger')->extraAttributes(['class' => 'mt-2'])
                     ]),
+                    
 
                 ])->extraAttributes([
                             'class' => 'p-1 shadow-sm bg-white',

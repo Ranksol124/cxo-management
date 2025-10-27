@@ -24,7 +24,7 @@ class FeedController extends Controller
             $likeRecord->feed_likes = true;
             $likeRecord->feed_dislikes = false;
         }
-        
+
         $likeRecord->save();
 
         $likesCount = FeedLikesAndDislikes::where('members_feed_id', $feed->id)->where('feed_likes', true)->count();
@@ -84,10 +84,10 @@ class FeedController extends Controller
     public function unpublish($id)
     {
         $feed = MemberFeed::findOrFail($id);
-        if($feed->public == 0){
+        if ($feed->public == 0) {
 
             $feed->public = 1;
-        }else{
+        } else {
             $feed->public = 0;
         }
         $feed->save();

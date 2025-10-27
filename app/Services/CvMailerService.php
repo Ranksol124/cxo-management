@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Mail;
-
+use App\Mail\EventStatusUpdated;
 class CvMailerService
 {
     // protected string $superAdminEmail = 'superadmin@example.com'; // hardcoded email
@@ -22,5 +22,14 @@ class CvMailerService
                     ]);
             });
         }
+    }
+
+
+
+
+
+    public function SendEventStatus(string $userEmail, string $status)
+    {
+        Mail::to($userEmail)->send(new EventStatusUpdated($status, $userEmail));
     }
 }

@@ -22,6 +22,11 @@ class News extends Model
     {
         return $this->makeEncryptableAttribute();
     }
+    // In News model
+    public function membercontent()
+    {
+        return $this->belongsTo(MemberContent::class);
+    }
 
     protected function description(): Attribute
     {

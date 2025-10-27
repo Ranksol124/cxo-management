@@ -29,6 +29,9 @@ use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Columns\SelectColumn;
 
+use Filament\Tables\Actions\Action;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 class EventResource extends Resource
 {
 
@@ -103,9 +106,8 @@ class EventResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                // if NOT super-admin, only show active events
                 if (!auth()->user()?->hasRole(['super-admin', 'admin'])) {
-                    $query->where('event_status', 1);
+                    $query->where('event_type', 'public');
                 }
             })
             ->recordUrl(false)
@@ -184,6 +186,31 @@ class EventResource extends Resource
                     ->icon('heroicon-o-trash')
                     ->label('')
                     ->iconButton(),
+                Action::make('applyNow')
+                    ->label('Book a seat')
+                    ->icon('heroicon-o-briefcase')
+                    ->button()
+                    ->visible(fn() => Auth::user()->hasRole('member'))
+                    ->action(function (array $data, Event $record, $livewire) {
+
+                        $loggedInUser = auth()->user();
+                        // dd($loggedInUser);
+                        $memberId =   \App\Models\Member::where('user_id', $loggedInUser->id)->first();
+                        // dd($memberId->id , $record->id);
+
+                        \App\Models\EventMembers::create([
+                            'member_id' => $memberId->id,
+                            'event_id' => $record->id,
+                            'status' => null,
+                        ]);
+
+                        Notification::make()
+                            ->title('Thanks for booking the seat')
+                            ->success()
+                            ->send();
+
+
+                    })
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
