@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MemberContent;
+use App\Models\Notifications;
 use App\Models\User;
 use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
@@ -24,6 +25,11 @@ class ApiController extends Controller
 {
     public function GetRecordAll(Request $request)
     {
+        $defaultNo = 10;
+        $perPage = $request->get('per_page', $defaultNo);
+        $page = $request->get('page', 1);
+        $table = $request->get('model');
+
         $apiKey = $request->header('x-api-key');
         $Key = env('Apikey');
 
@@ -34,8 +40,8 @@ class ApiController extends Controller
             ], 403);
         }
 
-        $userId = $request->header('member-id');
 
+        $userId = $request->header('member-id');
         if (!$userId) {
             return response()->json([
                 'success' => false,
@@ -44,7 +50,6 @@ class ApiController extends Controller
         }
 
         $member = Member::where('user_id', $userId)->first();
-
         $memberId = $member ? $member->id : null;
 
         $models = [
@@ -58,31 +63,34 @@ class ApiController extends Controller
             'member_feeds' => [MemberFeed::class, ['user', 'comments', 'attachments', 'likesAndDislikes']],
             'member_contents' => [MemberContent::class, []],
             'my_content' => [MemberContent::class, []],
+            'notifications' => [Notifications::class, []],
         ];
 
         $data = [];
 
+
         foreach ($models as $key => [$modelClass, $relations]) {
-            if ($key === 'my_content') {
-
-                $data[$key] = $memberId
-                    ? $modelClass::with($relations)->where('member_id', $memberId)->get()
-                    : collect();
-            } elseif ($key === 'my_jobs') {
-
-                $data[$key] = $userId
-                    ? $modelClass::with($relations)->where('user_id', $userId)->get()
-                    : collect();
-            } else {
-                $data[$key] = $modelClass::with($relations)->get();
+            if ($table && $table !== $key) {
+                continue; 
             }
+            if ($key === 'my_content') {
+                $query = $memberId ? $modelClass::with($relations)->where('member_id', $memberId) : $modelClass::query();
+            } elseif ($key === 'my_jobs') {
+                $query = $userId ? $modelClass::with($relations)->where('user_id', $userId) : $modelClass::query();
+            } else {
+                $query = $modelClass::with($relations);
+            }
+
+            $data[$key] = $query->paginate($perPage, ['*'], 'page', $page);
         }
+
 
         return response()->json([
             'success' => true,
             'data' => $data,
         ]);
     }
+
 
     //auth work from here 
 
@@ -178,4 +186,39 @@ class ApiController extends Controller
         return response()->json(['message' => 'Job applied successfully']);
     }
 
+
+
+
+
+
+
+
+
+    public function BookEvent(Request $request, CvMailerService $cvMailerService)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'event_id' => 'required|exists:events,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $loggedInUser = auth()->user();
+
+        $member = Member::where('user_id', $loggedInUser->id)->first();
+
+        if (!$member) {
+            return response()->json(['error' => 'Member not found.'], 404);
+        }
+        $eventMember = \App\Models\EventMembers::create([
+            'member_id' => $member->id,
+            'event_id' => $request->event_id,
+            'status' => null,
+        ]);
+
+
+        return response()->json(['message' => 'Thanks for booking the event seat']);
+    }
 }
