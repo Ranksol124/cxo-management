@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
         "phpmailer/phpmailer": "^6.10",
+        "pusher/pusher-php-server": "^7.2",
         "rupadana/filament-api-service": "^3.4",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-settings": "^3.4",

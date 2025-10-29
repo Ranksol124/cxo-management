@@ -38,4 +38,15 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
+    'pusher' => [
+        'driver' => 'pusher',
+        'key' => env('PUSHER_KEY'),
+        'secret' => env('PUSHER_SECRET'),
+        'app_id' => env('PUSHER_ID'),
+        'options' => [
+            'cluster' => env('PUSHER_CLUSTER'),
+            'useTLS' => true,
+        ],
+    ],
+
 ];

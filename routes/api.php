@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
 use App\Http\Middleware\ApiPublicRestriction;
 use App\Http\Controllers\FeedController;
-
+use App\Events\Spotlight;
 Route::get('data-response', [ApiController::class, 'GetRecordAll']);
 
 
