@@ -7,6 +7,8 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
+
 class CreateMember extends CreateRecord
 {
     protected static string $resource = MemberResource::class;
