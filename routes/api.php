@@ -7,6 +7,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Middleware\ApiPublicRestriction;
 use App\Http\Controllers\FeedController;
 use App\Events\Spotlight;
+use App\Http\Controllers\Api\NotificationController;
 Route::get('data-response', [ApiController::class, 'GetRecordAll']);
 
 
@@ -18,6 +19,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/auth/apply-job', [ApiController::class, 'ApplyJob']);
     Route::post('/auth/book-event', [ApiController::class, 'BookEvent']);
     Route::post('/{feed}/like', [FeedController::class, 'like'])->name('feed.like');
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/clear/{id}', [NotificationController::class, 'destroy']);
 });
 
 

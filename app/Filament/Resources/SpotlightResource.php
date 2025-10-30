@@ -18,7 +18,10 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\SelectColumn;
+use Illuminate\Support\Facades\Auth;
+
 class SpotlightResource extends Resource
 {
     protected static ?string $model = User::class;
@@ -32,10 +35,7 @@ class SpotlightResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-
-
-            ]);
+            ->schema([]);
     }
     public static function canCreate(): bool
     {
@@ -49,14 +49,34 @@ class SpotlightResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')  ->extraAttributes(['class' => 'ml-[-340px]'])->label('Member Name')->sortable()->searchable(),
-                TextColumn::make('email') ->extraAttributes(['class' => 'ml-[-160px]'])->label('Email')->sortable()->searchable(),
+                TextColumn::make('name')->extraAttributes(['class' => 'ml-[-340px]'])->label('Member Name')->sortable()->searchable(),
+                TextColumn::make('email')->extraAttributes(['class' => 'ml-[-160px]'])->label('Email')->sortable()->searchable(),
                 Tables\Columns\ToggleColumn::make('spotlight')
                     ->label('Spotlight')
                     ->sortable()
                     ->inline()
                     ->extraAttributes(['class' => 'ml-[-140px]'])
-                    ->visible(fn($record) => auth()->user()?->hasAnyRole(['super-admin'])),
+                    ->visible(fn($record) => auth()->user()?->hasAnyRole(['super-admin']))
+                    ->afterStateUpdated(function ($state, $record) {
+                        $user = Auth::user();
+                        $superAdminId = $user->hasRole('super-admin') ? $user->id : null;
+                        $recipients = User::where('id', '!=', $superAdminId)->get();
+
+                        if ($state == 1) {
+                            Notification::make()
+                                ->title('New Spotlight Created!')
+                                ->body('"' . $record->name . '" has been set as the new Spotlight.')
+                                ->sendToDatabase($recipients)
+                                ->broadcast($recipients);
+                        } else {
+                            Notification::make()
+                                ->title('Spotlight Removed')
+                                ->body('"' . $record->name . '" is no longer a Spotlight member.')
+                                ->sendToDatabase($recipients)
+                                ->broadcast($recipients);
+                        }
+                    })
+
             ])
             ->actions([])
             ->bulkActions([

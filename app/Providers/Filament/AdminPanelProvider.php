@@ -50,6 +50,8 @@ class AdminPanelProvider extends PanelProvider
                 'Media Center',
             ])
             ->sidebarCollapsibleOnDesktop()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('5s') // optional: auto-refresh every 5 seconds
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             // ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -59,23 +61,23 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                    // Widgets\AccountWidget::class,
+                // Widgets\AccountWidget::class,
                 StatsOverview::class,
             ])
 
             // ->navigationItems([
-//                     \Filament\Navigation\NavigationItem::make('Plans')
-//                         ->url(fn() => route('filament.admin.resources.plans.index'))
-//                         // ->icon('heroicon-o-clipboard-list')
-//                         ->group('Membership')
-//                         ->visible(fn() => true), // Always visible
+            //                     \Filament\Navigation\NavigationItem::make('Plans')
+            //                         ->url(fn() => route('filament.admin.resources.plans.index'))
+            //                         // ->icon('heroicon-o-clipboard-list')
+            //                         ->group('Membership')
+            //                         ->visible(fn() => true), // Always visible
 
             //                     \Filament\Navigation\NavigationItem::make('Members')
-//                         ->url(fn() => route('filament.admin.resources.members.index'))
-//                         ->icon('heroicon-o-users')
-//                         ->group('Membership')
-//                         ->visible(fn() => auth()->user()?->plan_id), // Only visible if user has a plan
-//                 ])
+            //                         ->url(fn() => route('filament.admin.resources.members.index'))
+            //                         ->icon('heroicon-o-users')
+            //                         ->group('Membership')
+            //                         ->visible(fn() => auth()->user()?->plan_id), // Only visible if user has a plan
+            //                 ])
 
 
 
@@ -122,7 +124,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 // RoleRedirect::class
             ]);
-
     }
     public function boot(): void
     {

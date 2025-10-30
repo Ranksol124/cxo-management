@@ -3,9 +3,10 @@
 namespace App\Filament\Resources\MemberResource\Pages;
 
 use App\Filament\Resources\MemberResource;
+use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Filament\Resources\Pages\CreateRecord;
-
+use Filament\Notifications\Notification;
 class CreateMember extends CreateRecord
 {
     protected static string $resource = MemberResource::class;
@@ -14,7 +15,7 @@ class CreateMember extends CreateRecord
     {
         $data = $this->form->getState();
 
-        
+
         /*
         $planID = $data['plan_id'] ?? null;
         $planData = \App\Models\Plan::with('roles')->find($planID);
@@ -30,7 +31,7 @@ class CreateMember extends CreateRecord
         */
 
         if ($this->record->user) {
-          
+
             /*
             $rolesToAssign = [];
 
@@ -62,6 +63,20 @@ class CreateMember extends CreateRecord
             );
 
             $this->record->user->syncRoles([$memberRole->name]);
+
+            $user = Auth::user();
+            $superAdminId = null;
+
+            if ($user->hasRole('super-admin')) {
+                $superAdminId = $user->id;
+            }
+
+            $recipients = User::where('id', '!=', $superAdminId)->get();
+            Notification::make()
+                ->title('New member created')
+                ->body('"' . $this->record->full_name . '" has been created.')
+                ->sendToDatabase($recipients)
+                ->broadcast($recipients);
         }
     }
 }

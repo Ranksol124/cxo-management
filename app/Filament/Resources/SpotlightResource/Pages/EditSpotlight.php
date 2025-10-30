@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\SpotlightResource\Pages;
 
 use App\Filament\Resources\SpotlightResource;
+use App\Models\User;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSpotlight extends EditRecord
@@ -16,4 +18,6 @@ class EditSpotlight extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    
 }
