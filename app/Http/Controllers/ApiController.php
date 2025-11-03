@@ -53,17 +53,17 @@ class ApiController extends Controller
         $memberId = $member ? $member->id : null;
 
         $models = [
-            // 'events' => [Event::class, []],
-            // 'job_post' => [JobPost::class, []],
-            // 'my_jobs' => [JobPost::class, []],
-            // 'news' => [News::class, []],
-            // 'magzines' => [Magazine::class, []],
-            // 'user' => [User::class, []],
-            // 'members' => [Member::class, []],
+            'events' => [Event::class, []],
+            'job_post' => [JobPost::class, []],
+            'my_jobs' => [JobPost::class, []],
+            'news' => [News::class, []],
+            'magzines' => [Magazine::class, []],
+            'user' => [User::class, []],
+            'members' => [Member::class, []],
             'member_feeds' => [MemberFeed::class, ['user', 'comments', 'attachments', 'likesAndDislikes']],
-            // 'member_contents' => [MemberContent::class, []],
-            // 'my_content' => [MemberContent::class, []],
-            // 'notifications' => [Notifications::class, []],
+            'member_contents' => [MemberContent::class, []],
+            'my_content' => [MemberContent::class, []],
+            'notifications' => [Notifications::class, []],
         ];
 
         $data = [];

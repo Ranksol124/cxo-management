@@ -1,6 +1,8 @@
 <div>
 @php
-    $userReaction = $getRecord()->likesAndDislikes;
+    $userReaction = $getRecord()->likesAndDislikes()
+    ->where('user_id', auth()->id())
+    ->first();
     $userLiked = $userReaction && $userReaction->feed_likes;
     $userDisliked = $userReaction && $userReaction->feed_dislikes;
 
@@ -97,7 +99,8 @@
 
         <div class="flex items-center justify-start space-x-6 text-sm text-gray-600 pt-2">
             <span id="likes-count-{{ $getRecord()->id }}">
-                {{ $getRecord()->likesAndDislikes?->feed_likes ?? 0 }} Likes
+              {{ $getRecord()->likesAndDislikes->where('feed_likes', 1)->count() }} Likes
+
             </span>
 
             <span>
