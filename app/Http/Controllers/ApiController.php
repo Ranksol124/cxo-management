@@ -71,7 +71,7 @@ class ApiController extends Controller
 
         foreach ($models as $key => [$modelClass, $relations]) {
             if ($table && $table !== $key) {
-                continue; 
+                continue;
             }
             if ($key === 'my_content') {
                 $query = $memberId ? $modelClass::with($relations)->where('member_id', $memberId) : $modelClass::query();

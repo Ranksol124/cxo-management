@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\JobPostResource\Pages;
 use App\Filament\Resources\JobPostResource\RelationManagers;
 use App\Models\JobPost;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -37,7 +38,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\CvMailerService;
 use Filament\Notifications\Notification;
 use Livewire\Component;
-
+use App\Events\EventCreate;
 class JobPostResource extends Resource
 {
     protected static ?string $model = JobPost::class;
@@ -138,14 +139,40 @@ class JobPostResource extends Resource
                         Tables\Columns\TextColumn::make('title')->prefix('Title: ')->limit(50)->extraAttributes(['class' => 'font-semibold']),
                         Tables\Columns\TextColumn::make('company')->prefix('Company: ')->extraAttributes(['class' => 'mb-1 mt-1']),
                         Tables\Columns\TextColumn::make('link')->extraAttributes(['class' => 'mb-1']),
+
+
                         SelectColumn::make('job_status')
                             ->options([
                                 1 => 'Active',
                                 0 => 'Inactive',
                             ])
-                            ->default(0) // default to Inactive
-                            ->selectablePlaceholder(false) // prevents empty option
-                            ->visible(fn($record) => auth()->user()?->hasAnyRole(['super-admin', 'moderator']))->extraAttributes(['class' => 'my-1'])
+                            ->default(0)
+                            ->selectablePlaceholder(false)
+                            ->visible(fn($record) => auth()->user()?->hasAnyRole(['super-admin', 'moderator']))
+                            ->afterStateUpdated(function ($state, $record, $column) {
+                                $record->job_status = $state;
+                                $record->save();
+
+                                if ($state == 1) {
+
+                                    EventCreate::dispatch($record);
+
+                                    $recipients = User::all()->filter(fn($u) => $u->hasRole('member'));
+
+                                    Notification::make()
+                                        ->title('Job Available')
+                                        ->body("\"{$record->title}\" is now active.")
+                                        ->icon('heroicon-o-briefcase')
+                                        ->color('success')
+                                        ->sendToDatabase($recipients)
+                                        ->broadcast($recipients);
+                                }
+                            }),
+
+
+
+
+
                         // ToggleColumn::make('job_status')
                         //     ->label('Approved')
                         //     ->getStateUsing(fn($record) => $record->job_status == 1)
@@ -176,9 +203,13 @@ class JobPostResource extends Resource
                     ->label('Apply Now')
                     ->icon('heroicon-o-briefcase')
                     ->button()
+
                     // ->extraAttributes(['class'=>'bg-[#06B6D4] text-white  hover:bg-[#06B6D4]'])
-                    ->visible(fn() => Auth::user()->hasRole('member'))
-                    ->modal('applyNowModal')
+                    ->visible(
+                        fn(JobPost $record) =>
+                        Auth::user()->hasRole('member') && $record->user_id !== Auth::id()
+                    )
+                    ->modal(true)
                     ->modalHeading('Upload your CV')
                     ->modalWidth('md')
                     ->form([

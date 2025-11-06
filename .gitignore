@@ -24,3 +24,4 @@ auth.json
 /vendor
 Homestead.json
 Homestead.yaml
+*.rest
