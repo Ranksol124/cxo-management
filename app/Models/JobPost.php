@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Encryptable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class JobPost extends Model
 {
-    use Encryptable;
+    use Encryptable,HasFactory;
     protected $fillable = [
         'user_id',
         'title',

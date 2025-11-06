@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Event;
+use App\Models\JobPost;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,7 +21,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             // FilamentTestUsersSeeder::class,
-            PermissionSeeder::class,
+            //PermissionSeeder::class,
+            Event::factory()->count(150)->create(),
+            //JobPost::factory()->count(10)->create()
         ]);
         // User::factory()->create([
         //     'name' => 'Test User',
