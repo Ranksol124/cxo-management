@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             // FilamentTestUsersSeeder::class,
             //PermissionSeeder::class,
             Event::factory()->count(150)->create(),
-            //JobPost::factory()->count(10)->create()
+            JobPost::factory()->count(10)->create()
         ]);
         // User::factory()->create([
         //     'name' => 'Test User',
