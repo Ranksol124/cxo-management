@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
+use GrahamCampbell\ResultType\Success;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use App\Models\Plan;
@@ -53,7 +54,7 @@ class PaymentCheckout extends Page
             $this->paymentSucceeded($paymentIntent);
 
 
-            return redirect('/portal/profile-settings');
+            return redirect('/portal/my-profile');
 
         }
 
@@ -93,11 +94,37 @@ class PaymentCheckout extends Page
             'response' => json_encode($paymentIntent),
         ]);
 
-        // $currentMember = Member::where('user_id', $member->id)->first();
-        // $currentMember->update([
-        //     'plan_id' => $this->plan->id,
-        // ]);
+        $currentMember = Member::where('user_id', $member->id)->first();
+        if (!$currentMember) {
+            $this->notify('danger', 'This user does not have member account.');
+            return;
+        }
 
+        // dd($member->id);
+        $planName = $this->plan->name;
+
+        switch ($planName) {
+            case 'Basic':
+                $credits = 10;
+                break;
+            case 'Silver':
+                $credits = 25;
+                break;
+            case 'Gold':
+                $credits = 50;
+                break;
+            default:
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Plan not found.'
+                ]);
+        }
+
+        $currentMember->update([
+            'plan_id' => $this->plan->id,
+            'remaining_credits' => $credits,
+        ]);
+        // dd($currentMember);
         // $this->dispatchBrowserEvent('payment-success');
     }
 }

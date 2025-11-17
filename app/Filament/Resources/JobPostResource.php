@@ -233,27 +233,71 @@ class JobPostResource extends Resource
                         $absolutePath = storage_path('app/public/' . $cvPath);
 
                         $jobOwnerEmail = $record->user?->email;
-                        // dd($jobOwnerEmail);
+
+  
+                        $member = \App\Models\Member::where('user_id', $loggedInUser->id)->first();
+                        if (!$member) {
+                            return null;
+                        }
+
+                        $memberPlan = \App\Models\Plan::find($member->plan_id);
+
+          
+                        $deduction = match ($memberPlan->name) {
+                            'Gold' => 10,
+                            'Silver' => 5,
+                            'Basic' => 2,
+                            default => null,
+                        };
+
+         
+                        if ($deduction === null) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Plan not found.'
+                            ]);
+                        }
+
+                        $currentCredits = $member->remaining_credits;
+
+         
+                        if ($currentCredits < $deduction) {
+                            Notification::make()
+                                ->title('Not enough credits to apply!')
+                                ->danger()
+                                ->send();
+                            return null;
+                        }
+
+                
                         if ($jobOwnerEmail) {
+                            // Send CV
                             (new CvMailerService())->sendCv(
                                 $absolutePath,
                                 $fileName,
                                 $jobOwnerEmail
                             );
+
+                      
+                            \App\Models\JobMembers::create([
+                                'members_id' => $loggedInUser->id,
+                                'jobs_id' => $record->id,
+                                'cv_upload' => $cvPath,
+                            ]);
+
+                    
+                            $member->update([
+                                'remaining_credits' => max(0, $currentCredits - $deduction),
+                            ]);
+
+                       
+                            Notification::make()
+                                ->title('job Applied successfully')
+                                ->success()
+                                ->send();
                         } else {
                             return null;
                         }
-
-                        \App\Models\JobMembers::create([
-                            'members_id' => $loggedInUser->id,
-                            'jobs_id' => $record->id,
-                            'cv_upload' => $cvPath,
-                        ]);
-
-                        Notification::make()
-                            ->title('Applied successfully')
-                            ->success()
-                            ->send();
 
 
                     })

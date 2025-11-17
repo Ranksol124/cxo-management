@@ -2,39 +2,40 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MemberResource\Pages;
-use App\Models\Member;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Member;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
+use App\Enums\MemberStatus;
+use App\Enums\PaymentMethods;
+use App\Enums\PaymentTimeline;
+use Filament\Resources\Resource;
+use App\Enums\OrganizationStatus;
+use App\Enums\OrganizationBusiness;
 use Filament\Forms\Components\Grid;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
-use App\Enums\OrganizationBusiness;
-use App\Enums\PaymentMethods;
-use App\Enums\MemberStatus;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\Group;
-use App\Enums\OrganizationStatus;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Forms\Components\Radio;
-use App\Enums\PaymentTimeline;
-use App\Filament\Traits\HasResourcePermissions;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\Actions\Action;
+use App\Filament\Traits\HasResourcePermissions;
+use App\Filament\Resources\MemberResource\Pages;
 
 class MemberResource extends Resource
 {
@@ -59,6 +60,7 @@ class MemberResource extends Resource
                             TextInput::make('full_name')->required(),
                             TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
                             TextInput::make('contact')->required(),
+                            TextInput::make('remaining_credit')->numeric()->required(),
                             // Select::make('country_id')
                             //     ->label('Country')
                             //     ->relationship('country', 'name')
@@ -252,6 +254,8 @@ class MemberResource extends Resource
                 if (!auth()->user()?->hasAnyRole(['super-admin', 'admin'])) {
                     $query->where('status', 'active');
                 }
+                // Order latest first
+                $query->orderBy('created_at', 'desc');
             })
             ->recordUrl(false)
             ->contentGrid([
@@ -259,17 +263,12 @@ class MemberResource extends Resource
                 'lg' => 4,
             ])
             ->columns([
-                Stack::make([
-                    Stack::make([
-                        ImageColumn::make('dp')->url(null)
-                            ->extraImgAttributes(['class' => 'rounded-t-md !h-40 !w-40'])
-                            ->defaultImageUrl(asset('icons/no_icon.svg')),
-                    ])->extraAttributes(['class' => 'mb-4 text-center']),
-
+                Stack::make([  
+                    ViewColumn::make('image')->view('tables.columns.member-image'),
                     Stack::make([
                         TextColumn::make('full_name')
                             ->url(null)
-                            ->prefix('Name: ')
+                            ->prefix('Name:')
                             ->searchable()
                             ->limit(50)
                             ->extraAttributes(['class' => 'font-semibold']),
@@ -284,7 +283,10 @@ class MemberResource extends Resource
                             ->url(null)
                             ->prefix('Contact: ')
                             ->extraAttributes(['class' => 'mb-1']),
-
+                        TextColumn::make('credit')
+                                    ->label('Credits')
+                                    ->sortable()
+                                    ->extraAttributes(['class' => 'font-bold']),
                         BadgeColumn::make('plan.name')
                             ->url(null)
                             ->prefix('Plan: ')
@@ -318,8 +320,8 @@ class MemberResource extends Resource
                             ->visible(fn($record) => auth()->user()?->hasAnyRole(['super-admin', 'moderator', 'admin'])),
                     ]),
                 ])->extraAttributes([
-                            'class' => 'p-1 shadow-sm bg-white',
-                        ]),
+                    'class' => 'p-1 shadow-sm bg-white',
+                ]),
             ])
             ->actions([
                 ViewAction::make()
