@@ -2,40 +2,41 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MemberResource\Pages;
-use App\Models\Member;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Member;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
+use App\Enums\MemberStatus;
+use App\Enums\PaymentMethods;
+use App\Enums\PaymentTimeline;
+use Filament\Resources\Resource;
+use App\Enums\OrganizationStatus;
+use App\Enums\OrganizationBusiness;
 use Filament\Forms\Components\Grid;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
-use App\Enums\OrganizationBusiness;
-use App\Enums\PaymentMethods;
-use App\Enums\MemberStatus;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\Group;
-use App\Enums\OrganizationStatus;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Forms\Components\Radio;
-use App\Enums\PaymentTimeline;
-use App\Filament\Traits\HasResourcePermissions;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Model;
-
+use Filament\Forms\Components\Actions\Action;
+use App\Filament\Traits\HasResourcePermissions;
+use App\Filament\Resources\MemberResource\Pages;
+use Filament\Notifications\Notification;
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
@@ -59,6 +60,7 @@ class MemberResource extends Resource
                             TextInput::make('full_name')->required(),
                             TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
                             TextInput::make('contact')->required(),
+                            TextInput::make('remaining_credit')->numeric()->required(),
                             // Select::make('country_id')
                             //     ->label('Country')
                             //     ->relationship('country', 'name')
@@ -252,6 +254,8 @@ class MemberResource extends Resource
                 if (!auth()->user()?->hasAnyRole(['super-admin', 'admin'])) {
                     $query->where('status', 'active');
                 }
+                // Order latest first
+                $query->orderBy('created_at', 'desc');
             })
             ->recordUrl(false)
             ->contentGrid([
@@ -260,16 +264,11 @@ class MemberResource extends Resource
             ])
             ->columns([
                 Stack::make([
-                    Stack::make([
-                        ImageColumn::make('dp')->url(null)
-                            ->extraImgAttributes(['class' => 'rounded-t-md !h-40 !w-40'])
-                            ->defaultImageUrl(asset('icons/no_icon.svg')),
-                    ])->extraAttributes(['class' => 'mb-4 text-center']),
-
+                    ViewColumn::make('image')->view('tables.columns.member-image'),
                     Stack::make([
                         TextColumn::make('full_name')
                             ->url(null)
-                            ->prefix('Name: ')
+                            ->prefix('Name:')
                             ->searchable()
                             ->limit(50)
                             ->extraAttributes(['class' => 'font-semibold']),
@@ -284,7 +283,10 @@ class MemberResource extends Resource
                             ->url(null)
                             ->prefix('Contact: ')
                             ->extraAttributes(['class' => 'mb-1']),
-
+                        TextColumn::make('credit')
+                            ->label('Credits')
+                            ->sortable()
+                            ->extraAttributes(['class' => 'font-bold']),
                         BadgeColumn::make('plan.name')
                             ->url(null)
                             ->prefix('Plan: ')
@@ -322,10 +324,117 @@ class MemberResource extends Resource
                         ]),
             ])
             ->actions([
-                ViewAction::make()
-                    ->icon('heroicon-o-eye')
+                Tables\Actions\Action::make('adminViewMember')
                     ->label('')
-                    ->iconButton(),
+                    ->icon('heroicon-o-eye')
+                    ->iconButton()
+                    ->visible(fn() => auth()->user()->hasRole('super-admin')) 
+                    ->action(function ($record) {
+                        return redirect(
+                            MemberResource::getUrl('view', ['record' => $record])
+                        );
+                    }),
+
+                Tables\Actions\Action::make('viewMember')
+                    ->label('')
+                    ->icon('heroicon-o-eye')
+                    ->iconButton()
+                    ->visible(fn() => !auth()->user()->hasRole('super-admin'))
+                    ->modalHeading('View Member?')
+                    ->modalDescription(function ($record) {
+
+                        $loggedInUser = auth()->user();
+
+                        if ($loggedInUser->hasRole('super-admin')) {
+                            return '';
+                        }
+
+                        $member = \App\Models\Member::where('user_id', $loggedInUser->id)->first();
+
+                        if (!$member) {
+                            return "Unable to calculate credits.(no member exist)";
+                        }
+
+                        $plan = \App\Models\Plan::find($member->plan_id);
+
+                        if (!$plan) {
+                            return "Unable to calculate credits (plan missing).";
+                        }
+
+                        $deduction = match ($plan->name) {
+                            'Gold' => 15,
+                            'Silver' => 5,
+                            'Basic' => 2,
+                            default => 0,
+                        };
+
+                        return "This will deduct {$deduction} credits to view this user.";
+                    })
+                    ->modalSubmitActionLabel('Yes, Continue')
+                    ->modalCancelActionLabel('Cancel')
+
+                    ->action(function ($record) {
+
+                        $loggedInUser = auth()->user();
+
+
+                        if ($loggedInUser->hasRole('super-admin')) {
+                            return redirect(
+                                MemberResource::getUrl('view', ['record' => $record])
+                            );
+                        }
+
+                        $jobOwnerEmail = $record->user?->email;
+                        $member = \App\Models\Member::where('user_id', $loggedInUser->id)->first();
+
+                        if (!$member) {
+                            return null;
+                        }
+
+                        $memberPlan = \App\Models\Plan::find($member->plan_id);
+
+                        $deduction = match ($memberPlan->name) {
+                            'Gold' => 15,
+                            'Silver' => 5,
+                            'Basic' => 2,
+                            default => null,
+                        };
+
+                        if ($deduction === null) {
+                            Notification::make()
+                                ->title('Plan not found.')
+                                ->danger()
+                                ->send();
+                            return null;
+                        }
+
+                        $currentCredits = $member->remaining_credits;
+
+                        if ($currentCredits < $deduction) {
+                            Notification::make()
+                                ->title('Not enough credits to view this member!')
+                                ->danger()
+                                ->send();
+                            return null;
+                        }
+
+                        if ($jobOwnerEmail) {
+                            $member->update([
+                                'remaining_credits' => max(0, $currentCredits - $deduction),
+                            ]);
+
+                            Notification::make()
+                                ->title('Credits deducted successfully!')
+                                ->success()
+                                ->send();
+                        }
+
+                        return redirect(
+                            MemberResource::getUrl('view', ['record' => $record])
+                        );
+                    }),
+
+
 
                 Tables\Actions\EditAction::make()
                     ->icon('heroicon-o-pencil')

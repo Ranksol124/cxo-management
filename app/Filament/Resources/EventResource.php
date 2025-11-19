@@ -194,22 +194,55 @@ class EventResource extends Resource
                     ->action(function (array $data, Event $record, $livewire) {
 
                         $loggedInUser = auth()->user();
-                        // dd($loggedInUser);
-                        $memberId =   \App\Models\Member::where('user_id', $loggedInUser->id)->first();
-                        // dd($memberId->id , $record->id);
 
-                        \App\Models\EventMembers::create([
-                            'member_id' => $memberId->id,
-                            'event_id' => $record->id,
-                            'status' => null,
-                        ]);
+                        $member = \App\Models\Member::where('user_id', $loggedInUser->id)->first();
+                        if (!$member) {
+                            return null;
+                        } else {
+                            $memberPlan = \App\Models\Plan::find($member->plan_id);
 
-                        Notification::make()
-                            ->title('Thanks for booking the seat')
-                            ->success()
-                            ->send();
+                            $deduction = match ($memberPlan->name) {
+                                'Gold' => 5,
+                                'Silver' => 3,
+                                'Basic' => 3,
+                                default => null,
+                            };
+
+                            if ($deduction === null) {
+                                return response()->json([
+                                    'success' => false,
+                                    'message' => 'Plan not found.'
+                                ]);
+                            }
+
+                            $currentCredits = $member->remaining_credits;
+                            if ($currentCredits < $deduction) {
+
+                                Notification::make()
+                                    ->title('You dont have enough credits !')
+                                    ->success()
+                                    ->send();
 
 
+                            } else {
+                                \App\Models\EventMembers::create([
+                                    'member_id' => $member->id,
+                                    'event_id' => $record->id,
+                                    'status' => null,
+                                ]);
+
+
+                                $member->update([
+                                    'remaining_credits' => $currentCredits - $deduction,
+                                ]);
+                                Notification::make()
+                                    ->title('Thanks for booking the seat')
+                                    ->success()
+                                    ->send();
+                            }
+
+
+                        }
                     })
             ])
             ->bulkActions([

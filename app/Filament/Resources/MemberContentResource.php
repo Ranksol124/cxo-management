@@ -28,7 +28,7 @@ class MemberContentResource extends Resource
 {
     protected static ?string $model = MemberContent::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    
+
 
     public static function canCreate(): bool
     {
@@ -37,7 +37,7 @@ class MemberContentResource extends Resource
     }
     public static function getNavigationLabel(): string
     {
-        $roles = Auth::user()->roles()->pluck('name')->map(fn ($r) => strtolower($r));
+        $roles = Auth::user()->roles()->pluck('name')->map(fn($r) => strtolower($r));
 
         if ($roles->intersect(['super-admin', 'admin'])->isNotEmpty()) {
             return 'Member Contents';
@@ -46,7 +46,7 @@ class MemberContentResource extends Resource
         return 'My Content';
     }
 
-    
+
     public static function form(Form $form): Form
     {
         return $form
@@ -56,40 +56,40 @@ class MemberContentResource extends Resource
                         'class' => 'filament-custom-section',
                     ])->schema([
 
-                        Forms\Components\TextInput::make('title')
-                            ->label('Title')
-                            ->required()
-                            ->maxLength(255),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Title')
+                                ->required()
+                                ->maxLength(255),
 
-                        Select::make('content_type')
-                            ->label('Content Type')
-                            ->options([
-                                'News' => 'News',
-                                'Magazine' => 'Magazine',
-                            ])
-                            ->required()
-                            ->reactive() // 👈 this is needed to trigger dependent field updates
-                            ->afterStateUpdated(fn(callable $set) => $set('news_type', null)),
+                            Select::make('content_type')
+                                ->label('Content Type')
+                                ->options([
+                                    'News' => 'News',
+                                    'Magazine' => 'Magazine',
+                                ])
+                                ->required()
+                                ->reactive() // 👈 this is needed to trigger dependent field updates
+                                ->afterStateUpdated(fn(callable $set) => $set('news_type', null)),
 
-                        Select::make('news_type')
-                            ->label('News Type')
-                            ->options(NewsType::options())
-                            ->visible(fn(callable $get) => $get('content_type') === 'News')
-                            ->required(fn(callable $get) => $get('content_type') === 'News')
-                            ->reactive(), // optional but good practice if more fields depend on this
+                            Select::make('news_type')
+                                ->label('News Type')
+                                ->options(NewsType::options())
+                                ->visible(fn(callable $get) => $get('content_type') === 'News')
+                                ->required(fn(callable $get) => $get('content_type') === 'News')
+                                ->reactive(), // optional but good practice if more fields depend on this
 
-                        Textarea::make('description')
-                            ->label('Description')
-                            ->columnSpanFull(),
+                            Textarea::make('description')
+                                ->label('Description')
+                                ->columnSpanFull(),
 
-                        Forms\Components\FileUpload::make('content_attachments_files')
-                            ->label('Upload attachments')
-                            ->multiple()
-                            ->disk('public')
-                            ->directory('member_contents')->columnSpanFull()
-                            ->maxSize(15360) // 15 MB in KB
-                            ->helperText('Allowed file types: PDF, DOC, DOCX, JPG, PNG, GIF, WEBP (max 15 MB)'),
-                    ])
+                            Forms\Components\FileUpload::make('content_attachments_files')
+                                ->label('Upload attachments')
+                                ->multiple()
+                                ->disk('public')
+                                ->directory('member_contents')->columnSpanFull()
+                                ->maxSize(15360) // 15 MB in KB
+                                ->helperText('Allowed file types: PDF, DOC, DOCX, JPG, PNG, GIF, WEBP (max 15 MB)'),
+                        ])
             ]);
     }
 
@@ -139,7 +139,7 @@ class MemberContentResource extends Resource
             ->filters([
                 //
             ])
-            
+
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
