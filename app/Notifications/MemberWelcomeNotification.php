@@ -60,7 +60,7 @@ class MemberWelcomeNotification extends Notification
             'name' => $notifiable->name,
             'email' => $notifiable->email,
             'appName' => config('app.name'),
-            'appUrl' => config('app.url'),
+            'appUrl' => config('app.moburl'),
         ];
 
         return (new MailMessage)
@@ -72,7 +72,7 @@ class MemberWelcomeNotification extends Notification
                 $this->replacePlaceholders($settings->button_text, $replacements),
                 $this->verificationURL
             )
-            ->line('**Make sure to change the password in order to login again.**') 
+            ->line('**Make sure to change the password in order to login again.**')
             ->line($this->replacePlaceholders($settings->closing_line, $replacements));
     }
 

@@ -35,7 +35,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
-
+use Filament\Forms\Components\DatePicker;
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
@@ -90,6 +90,21 @@ class MemberResource extends Resource
 
                             TextInput::make('designation')->required(),
                             TextInput::make('zip_code')->required(),
+                            Select::make('gender')
+                                ->options([
+                                    'male' => 'Male',
+                                    'female' => 'Female',
+                                    'other' => 'Other',
+                                ])
+                                ->required(),
+
+
+                            DatePicker::make('date_of_joining')
+                                ->required(),
+
+                            DatePicker::make('date_of_expiry')
+                                ->required(),
+
 
                             Select::make('plan_id')
                                 ->label('Select Plan')

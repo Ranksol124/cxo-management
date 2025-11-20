@@ -53,6 +53,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'moburl' => env('MOBILR_APP', 'https://play.google.com/store/apps/details?id=com.nimblewebsolutions.cxo'),
 
     /*
     |--------------------------------------------------------------------------
@@ -94,7 +95,7 @@ return [
     | are secure. You should do this prior to deploying the application.
     |
     */
-  
+
 
     'cipher' => 'AES-256-CBC',
 

@@ -28,7 +28,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-
+Route::post('/auth/login', [ApiController::class, 'login']);
 Route::middleware(['ApiPublicRestriction'])->group(function () {
 
     Route::post('/{feed}/comment', [FeedController::class, 'comment'])->name('feed.comment');

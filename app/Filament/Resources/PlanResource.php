@@ -71,7 +71,7 @@ class PlanResource extends Resource
                                 ->reactive(), // taake discount field ke sath sync ho
 
                             TextInput::make('discount_price')
-                                ->numeric()
+                                ->numeric()->required()
                                 ->rule(function (callable $get) {
                                     return function (string $attribute, $value, \Closure $fail) use ($get) {
                                         if ($value && $value >= $get('price')) {

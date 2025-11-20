@@ -18,7 +18,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Services\CvMailerService;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
@@ -139,7 +139,36 @@ class ApiController extends Controller
 
     }
 
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
 
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        $user = Auth::user();
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login success.',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'profile_picture' => $user->profile_picture,
+                'contact' => $user->contact,
+                'address' => $user->address,
+            ],
+        ]);
+
+        // return response()->json([
+        //     'success' => false,
+        //     'message' => 'The provided credentials are incorrect.',
+        // ], 401);
+    }
 
     public function ApplyJob(Request $request, CvMailerService $cvMailerService)
     {

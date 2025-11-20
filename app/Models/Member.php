@@ -21,6 +21,9 @@ class Member extends Model
         'membership_type',
         'payment_method',
         'dp',
+        'gender',
+        'date_of_joining',
+        'date_of_expiry',
         'user_id',
         'plan_id',
         'status'
