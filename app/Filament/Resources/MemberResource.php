@@ -36,6 +36,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\ViewColumn;
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
@@ -90,6 +91,9 @@ class MemberResource extends Resource
 
                             TextInput::make('designation')->required(),
                             TextInput::make('zip_code')->required(),
+
+                            TextInput::make('company_name')->required(),
+                            TextInput::make('city_name')->required(),
                             Select::make('gender')
                                 ->options([
                                     'male' => 'Male',
@@ -275,13 +279,15 @@ class MemberResource extends Resource
             ])
             ->columns([
                 Stack::make([
-                    Stack::make([
-                        ImageColumn::make('dp')->url(null)
-                            ->extraImgAttributes(['class' => 'rounded-t-md !h-40 !w-40'])
-                            ->defaultImageUrl(asset('icons/no_icon.svg')),
-                    ])->extraAttributes(['class' => 'mb-4 text-center']),
+                    // Stack::make([
+                    //     ImageColumn::make('profile_picture')
+                    //         ->extraImgAttributes(['class' => 'rounded-t-md !h-40 !w-40'])
+                    //         ->defaultImageUrl(asset('icons/no_icon.svg')), // fallback image
+                    // ])->extraAttributes(['class' => 'mb-4 text-center']),
+                    ViewColumn::make('image')->view('tables.columns.member-image'),
 
                     Stack::make([
+
                         TextColumn::make('full_name')
                             ->url(null)
                             ->prefix('Name: ')
@@ -299,6 +305,7 @@ class MemberResource extends Resource
                             ->url(null)
                             ->prefix('Contact: ')
                             ->extraAttributes(['class' => 'mb-1']),
+
 
                         BadgeColumn::make('plan.name')
                             ->url(null)

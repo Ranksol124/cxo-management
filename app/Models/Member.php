@@ -21,6 +21,8 @@ class Member extends Model
         'membership_type',
         'payment_method',
         'dp',
+        'company_name',
+        'city_name',
         'gender',
         'date_of_joining',
         'date_of_expiry',

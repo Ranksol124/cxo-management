@@ -25,7 +25,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Stack;
 use Illuminate\Support\Facades\Auth;
-
+use Filament\Tables\Columns\ViewColumn;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
@@ -87,12 +87,12 @@ class UserResource extends Resource
             ])
             ->columns([
                 Tables\Columns\Layout\Stack::make([
-                    Stack::make([
-                        ImageColumn::make('profile_picture')
-                            ->extraImgAttributes(['class' => 'rounded-t-md !h-40 !w-40'])
-                            ->defaultImageUrl(asset('icons/no_icon.svg')), // fallback image
-                    ])->extraAttributes(['class' => 'mb-4 text-center']),
-
+                    // Stack::make([
+                    //     ImageColumn::make('profile_picture')
+                    //         ->extraImgAttributes(['class' => 'rounded-t-md !h-40 !w-40'])
+                    //         ->defaultImageUrl(asset('icons/no_icon.svg')), // fallback image
+                    // ])->extraAttributes(['class' => 'mb-4 text-center']),
+       ViewColumn::make('image')->view('tables.columns.user-image'),
                     Stack::make([
                         Tables\Columns\TextColumn::make('name')->prefix('Name: ')->limit(50)->extraAttributes(['class' => 'font-semibold']),
                         Tables\Columns\TextColumn::make('email')->prefix('Email: ')->extraAttributes(['class' => 'mb-1 mt-1']),
