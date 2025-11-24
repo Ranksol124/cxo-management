@@ -23,6 +23,7 @@ class Member extends Model
         'dp',
         'company_name',
         'city_name',
+        'password',
         'gender',
         'date_of_joining',
         'date_of_expiry',
@@ -61,58 +62,53 @@ class Member extends Model
     }
 
     //member state
-    function state(){
+    function state()
+    {
         return $this->belongsTo(\App\Models\State::class, 'state_id');
     }
 
     //member city
-    function city(){
+    function city()
+    {
         return $this->belongsTo(\App\Models\City::class, 'city_id');
     }
 
     //Inside this functon we enter member also in user table and send welcome email to member 
     protected static function booted()
     {
-        
         static::created(function ($member) {
 
             if (!$member->user_id) {
-                $user = null;
-                
-                info("register member email");
-                info($member->email);
+                //  dd($member);
+               
+                $plainPassword = $member->password;
 
+               
+                $user = \App\Models\User::create([
+                    'name' => $member->full_name,
+                    'email' => $member->email ?: 'member_' . uniqid() . '@example.com',
+                    'password' => bcrypt($plainPassword),
+                ]);
+
+                $userIDEncrypted = urlencode(Crypt::encryptString($user->id));
+                $verificationURL = url('/member/verify?token=' . $userIDEncrypted);
+
+                // Send notification with the password
                 if ($member->email) {
-                    $user = \App\Models\User::where('email', $member->email)->first();
-                }
-
-                if (!$user) {
-                    $randomPassword = Str::random(8);
-                    
-
-                    $user = \App\Models\User::create([
-                        'name'     => $member->full_name,
-                        'email'    => $member->email ?: 'member_' . uniqid() . '@example.com',
-                        'password' => bcrypt($randomPassword),
-                    ]);
-                    $userIDEncrypted = urlencode(Crypt::encryptString($user->id));
-                    $verificationURL = url('/member/verify?token=' . $userIDEncrypted);
-        
-
-                    // Send notification instead of mailable
-                    if ($member->email) {
-                        info("sending email");
-                        $user->notify(new MemberWelcomeNotification($verificationURL ));
-                    }
+                    $user->notify(new \App\Notifications\MemberWelcomeNotification(
+                        $verificationURL,
+                        $plainPassword
+                    ));
                 }
 
                 $member->update(['user_id' => $user->id]);
             }
         });
-
     }
+
+
     public function hasPlan(): bool
-{
-    return !is_null($this->plan_id);
-}
+    {
+        return !is_null($this->plan_id);
+    }
 }

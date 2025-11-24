@@ -37,6 +37,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ViewColumn;
+use Rawilk\FilamentPasswordInput\Password;
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
@@ -59,6 +60,14 @@ class MemberResource extends Resource
                         Grid::make(2)->schema([
                             TextInput::make('full_name')->required(),
                             TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
+                            Password::make('password')
+                                ->label('Password')
+                                ->copyable()
+                                ->regeneratePassword()
+                                ->maxLength(8)
+                                ->dehydrateStateUsing(fn($state) => $state),
+
+
                             TextInput::make('contact')->required(),
                             // Select::make('country_id')
                             //     ->label('Country')
@@ -159,23 +168,7 @@ class MemberResource extends Resource
                             FileUpload::make('dp')->label('Profile Picture')
                                 ->image()
                                 ->directory('members')->columnSpanFull(),
-                            TextInput::make('password')
-                                ->password()
-                                ->label('Update Password')
-                                ->minLength(8)
-                                ->hiddenOn('create')
-                                ->dehydrateStateUsing(fn($state) => !empty($state) ? bcrypt($state) : null) // only hash when value given
-                                ->afterStateHydrated(fn($set) => $set('password', '')) // field always empty when form loads
-                                ->suffixActions([
-                                    Action::make('toggle')
-                                        ->icon('heroicon-m-eye')
-                                        ->tooltip('Show / Hide Password')
-                                        ->extraAttributes(['class' => 'eye-toggle']),
-                                    Action::make('copy')
-                                        ->icon('heroicon-m-clipboard')
-                                        ->tooltip('Copy Password')
-                                        ->extraAttributes(['class' => 'copy-password']),
-                                ])
+
                         ]),
 
                         # ENTERPRISE
