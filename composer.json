@@ -20,7 +20,6 @@
         "pusher/pusher-php-server": "^7.2",
         "rawilk/filament-password-input": "^2.1",
         "rupadana/filament-api-service": "^3.4",
-        "spatie/laravel-permission": "^6.21",
         "spatie/laravel-settings": "^3.4",
         "stripe/stripe-php": "^18.0"
     },

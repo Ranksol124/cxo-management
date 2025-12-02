@@ -68,10 +68,7 @@ class MemberWelcomeNotification extends Notification
             ->line("**Email:** {$notifiable->email}")
             ->line("**Password:** {$this->password}")
 
-            ->action(
-                $this->replacePlaceholders($settings->button_text, $replacements),
-                $this->verificationURL
-            )
+       
             ->line('Please update your password after logging in.')
             ->line($this->replacePlaceholders($settings->closing_line, $replacements));
     }

@@ -165,9 +165,9 @@ class MemberResource extends Resource
                                 }),
 
 
-                            FileUpload::make('dp')->label('Profile Picture')
-                                ->image()
-                                ->directory('members')->columnSpanFull(),
+                            // FileUpload::make('dp')->label('Profile Picture')
+                            //     ->image()
+                            //     ->directory('members')->columnSpanFull(),
 
                         ]),
 
